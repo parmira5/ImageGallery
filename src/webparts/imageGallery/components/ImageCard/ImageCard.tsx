@@ -5,13 +5,13 @@ import { imageService } from "../../../../services/imageService";
 import { Icon, Text } from "@fluentui/react";
 import { chatIconStyles, textStyles } from "./fluentui.styles";
 
-interface IImageDetails {
+interface IImageOverlay {
   id: number;
   title: string;
   description: string;
 }
 
-const ImageDetails = ({ description, title, id }: IImageDetails) => {
+const ImageOverlay = ({ description, title, id }: IImageOverlay) => {
   const [commentCount, setCommentCount] = React.useState<number>(0);
   React.useState(() => {
     imageService
@@ -44,10 +44,18 @@ interface IImageCard {
 }
 
 const ImageCard = ({ src, description, title, id, onClick }: IImageCard) => {
-  const resizedImage = ImageHelper.convertToImageUrl({ sourceUrl: src, width: 400, height: 500 });
+  const resizedImage = ImageHelper.convertToImageUrl({
+    sourceUrl: src,
+    width: 400,
+    height: 500,
+  });
   return (
-    <div tabIndex={0} className={styles.imageCard} onClick={handeImageCardClick}>
-      <ImageDetails id={id} description={description} title={title} />
+    <div
+      tabIndex={0}
+      className={styles.imageCard}
+      onClick={handeImageCardClick}
+    >
+      <ImageOverlay id={id} description={description} title={title} />
       <img src={resizedImage} alt="Test" />
     </div>
   );

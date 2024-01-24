@@ -6,7 +6,7 @@
     box-sizing: border-box;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     gap: 15px
   }
 
@@ -17,6 +17,10 @@
     gap: 3px;
   }
 
+  .imageDescriptionWrapper {
+    padding: 10px;
+  }
+
   .commentList {
     display: flex;
     flex-direction: column;
@@ -24,6 +28,8 @@
     flex-grow: 1;
     overflow-y: auto;
     gap: 18px;
+    padding: 10px 10px;
+    box-sizing: border-box;
   }
 
   .comment {

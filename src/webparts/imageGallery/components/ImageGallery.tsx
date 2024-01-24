@@ -5,7 +5,13 @@ import { imageService } from "../../../services/imageService";
 import { Image } from "../../../models/Image";
 import { Comments } from "./Comments/Comments";
 
-import { ActionButton, Panel, PanelType, Pivot, PivotItem } from "@fluentui/react";
+import {
+  ActionButton,
+  Panel,
+  PanelType,
+  Pivot,
+  PivotItem,
+} from "@fluentui/react";
 import { panelStyles, pivotStyles } from "./fluentui.styles";
 
 const ImageGallery = () => {
@@ -49,9 +55,15 @@ const ImageGallery = () => {
         customWidth="100%"
       >
         <section className={styles.fullSizeContainer}>
-          <img className={styles.fullSizeImage} src={selectedImage?.imagePath} alt="todo" />
-          <div style={{ backgroundColor: "white", width: "500px", height: "100%" }}>
-            {selectedImage?.id && <Comments imageId={selectedImage.id} />}
+          <img
+            className={styles.fullSizeImage}
+            src={selectedImage?.imagePath}
+            alt="todo"
+          />
+          <div
+            style={{ backgroundColor: "white", width: "500px", height: "100%" }}
+          >
+            {selectedImage?.id && <Comments image={selectedImage} />}
           </div>
         </section>
       </Panel>
