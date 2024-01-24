@@ -1,0 +1,39 @@
+
+ .comments {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px
+  }
+
+  .inputWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+  }
+
+  .commentList {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 1;
+    overflow-y: auto;
+    gap: 18px;
+  }
+
+  .comment {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .commentBody {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+  }
