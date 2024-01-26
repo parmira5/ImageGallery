@@ -5,25 +5,17 @@ import { imageService } from "../../../services/imageService";
 import { Image } from "../../../models/Image";
 import { Comments } from "./Comments/Comments";
 
-import {
-  ActionButton,
-  Panel,
-  PanelType,
-  Pivot,
-  PivotItem,
-} from "@fluentui/react";
+import { ActionButton, Panel, PanelType, Pivot, PivotItem } from "@fluentui/react";
 import { panelStyles, pivotStyles } from "./fluentui.styles";
+import { find } from "@microsoft/sp-lodash-subset";
 
-const ImageGallery = () => {
+const ImageGallery = (): JSX.Element => {
   const [images, setImages] = React.useState<Image[]>([]);
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState<Image>();
 
   React.useEffect(() => {
-    imageService
-      .getImages()
-      .then((res) => setImages(res))
-      .catch(console.error);
+    updateImageGallery().catch(console.error);
   }, []);
 
   return (
@@ -39,11 +31,14 @@ const ImageGallery = () => {
       <section className={styles.imageGridWrapper}>
         {images.map((img) => (
           <ImageCard
+            key={img.id}
             onClick={handleClickImage}
             id={img.id}
             src={img.imagePath}
             description={img.description}
             title={img.title}
+            commentCount={img.comments.commentCount}
+            fetchImageCommentCount={fetchImageComments}
           />
         ))}
       </section>
@@ -55,14 +50,8 @@ const ImageGallery = () => {
         customWidth="100%"
       >
         <section className={styles.fullSizeContainer}>
-          <img
-            className={styles.fullSizeImage}
-            src={selectedImage?.imagePath}
-            alt="todo"
-          />
-          <div
-            style={{ backgroundColor: "white", width: "500px", height: "100%" }}
-          >
+          <img className={styles.fullSizeImage} src={selectedImage?.imagePath} alt="todo" />
+          <div style={{ backgroundColor: "white", width: "500px", height: "100%" }}>
             {selectedImage?.id && <Comments image={selectedImage} />}
           </div>
         </section>
@@ -70,9 +59,22 @@ const ImageGallery = () => {
     </div>
   );
 
-  function handleClickImage(imageId: number) {
+  function handleClickImage(imageId: number): void {
     setSelectedImage(images.filter((img) => img.id === imageId)[0]);
     setIsOpen(true);
+  }
+
+  async function updateImageGallery(): Promise<void> {
+    const images = await imageService.getImages();
+    setImages(images);
+  }
+
+  async function fetchImageComments(imageId: number): Promise<void> {
+    const _comments = await imageService.getCommentCount(imageId);
+    const _images = [...images];
+    const img = find(_images, (img) => img.id === imageId);
+    if (img) img.comments = _comments;
+    setImages(_images);
   }
 };
 

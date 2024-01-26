@@ -7,7 +7,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: stretch;
-    gap: 15px
+    gap: 10px
   }
 
   .inputWrapper {
@@ -15,10 +15,13 @@
     display: flex;
     flex-direction: row;
     gap: 3px;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px 10px;
   }
 
   .imageDescriptionWrapper {
-    padding: 10px;
+    padding: 20px 20px 5px 20px;
   }
 
   .commentList {
@@ -28,7 +31,7 @@
     flex-grow: 1;
     overflow-y: auto;
     gap: 18px;
-    padding: 10px 10px;
+    padding: 10px 20px;
     box-sizing: border-box;
   }
 

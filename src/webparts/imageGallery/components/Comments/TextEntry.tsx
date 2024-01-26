@@ -18,7 +18,7 @@ export const TextEntry = ({
   text,
   createdDate,
   separator = false,
-}: ITextEntry) => {
+}: ITextEntry): JSX.Element => {
   const imageUrl = `https://r3v365.sharepoint.com/_layouts/15/userphoto.aspx?size=S&username=${authorEmail}`;
   const separatorStyles = separator
     ? {
@@ -28,18 +28,12 @@ export const TextEntry = ({
     : undefined;
   return (
     <section className={styles.comment} style={separatorStyles}>
-      <Persona
-        imageUrl={imageUrl}
-        size={PersonaSize.size24}
-        styles={{ root: { position: "relative", top: "3px" } }}
-      />
+      <Persona imageUrl={imageUrl} size={PersonaSize.size24} styles={{ root: { position: "relative", top: "3px" } }} />
       <div className={styles.commentBody}>
         <Text styles={commentTextStyles} variant="smallPlus">
           <b>{authorName}</b> <span>{text}</span>
         </Text>
-        <Text variant="smallPlus">
-          {createdDate && formatDistanceToNow(new Date(createdDate))} ago
-        </Text>
+        <Text variant="smallPlus">{createdDate && formatDistanceToNow(new Date(createdDate))} ago</Text>
       </div>
       <hr />
     </section>

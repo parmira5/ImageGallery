@@ -11,9 +11,11 @@ interface IComments {
   image: Image;
 }
 
-export const Comments = ({ image }: IComments) => {
+export const Comments = ({ image }: IComments): JSX.Element => {
   //   const [isLoading, setLoading] = React.useState(true);
   const [comments, setComments] = React.useState<Comment[]>([]);
+  const [newCommentText, setNewCommentText] = React.useState<string>();
+  // const []
 
   React.useState(() => {
     imageService
@@ -36,6 +38,7 @@ export const Comments = ({ image }: IComments) => {
       <section className={styles.commentList}>
         {comments.map((comment) => (
           <TextEntry
+            key={comment.id}
             authorEmail={comment.authorEmail}
             authorName={comment.authorName}
             createdDate={comment.createdDate}
@@ -45,9 +48,22 @@ export const Comments = ({ image }: IComments) => {
       </section>
       <section className={styles.inputWrapper}>
         <Persona size={PersonaSize.size24} styles={personStyles} />
-        <TextField styles={textFieldStyles} placeholder="Enter a comment" />
-        <ActionButton iconProps={{ iconName: "Send" }} />
+        <TextField onChange={handleChange} styles={textFieldStyles} placeholder="Enter a comment" />
+        <ActionButton onClick={postComment} iconProps={{ iconName: "Send" }} />
       </section>
     </section>
   );
+
+  function postComment() {
+    imageService
+      .postComment(image.id, newCommentText!)
+      .then((res) => {
+        setComments((prev) => [new Comment(res), ...prev]);
+      })
+      .catch(console.error);
+  }
+
+  function handleChange(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) {
+    setNewCommentText(newValue);
+  }
 };

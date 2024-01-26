@@ -1,3 +1,4 @@
+import { CommentsObj } from "./CommentsObj";
 import { IImageServerObj } from "./IImageServerObj";
 
 export class Image {
@@ -9,6 +10,7 @@ export class Image {
   authorEmail: string;
   authorName: string;
   createdDate: string;
+  comments: CommentsObj;
 
   constructor(image: IImageServerObj) {
     this.id = image.ID;
@@ -19,5 +21,10 @@ export class Image {
     this.authorName = image.Author.Title;
     this.authorEmail = image.Author.EMail;
     this.createdDate = image.Created;
+    this.comments = {
+      comments: [],
+      commentCount: 0,
+      nextPage: "",
+    };
   }
 }

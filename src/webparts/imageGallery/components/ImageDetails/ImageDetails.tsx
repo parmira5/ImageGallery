@@ -7,12 +7,7 @@ interface IImageDetails {
   commentCount: number;
 }
 
-const ImageDetails = ({
-  authorImageUrl,
-  authorName,
-  commentCount,
-  description,
-}: IImageDetails) => {
+const ImageDetails = ({ authorImageUrl, authorName, commentCount, description }: IImageDetails): JSX.Element => {
   return <div></div>;
 };
 
