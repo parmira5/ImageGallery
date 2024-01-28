@@ -1,4 +1,4 @@
-export interface IAuthor {
+export interface IAuthorObj {
   Name: string;
   EMail: string;
   Title: string;

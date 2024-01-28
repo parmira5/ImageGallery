@@ -1,29 +1,18 @@
 import * as React from "react";
-import { imageService } from "../../../../services/imageService";
-import { Comment } from "../../../../models/Comment";
+// import { imageService } from "../../../../services/imageService";
 import { TextEntry } from "./TextEntry";
 import { ActionButton, Persona, PersonaSize, TextField } from "@fluentui/react";
 import styles from "./Comments.module.scss";
 import { personStyles, textFieldStyles } from "./fluentui.styles";
-import { Image } from "../../../../models/Image";
+import { Post } from "../../../../models/Post";
+// import { CommentObj } from "../../../../models/CommentObj";
 
 interface IComments {
-  image: Image;
+  image: Post;
 }
 
 export const Comments = ({ image }: IComments): JSX.Element => {
-  //   const [isLoading, setLoading] = React.useState(true);
-  const [comments, setComments] = React.useState<Comment[]>([]);
-  const [newCommentText, setNewCommentText] = React.useState<string>();
-  // const []
-
-  React.useState(() => {
-    imageService
-      .getComments(image.id)
-      .then((res) => setComments(res))
-      .catch(console.error);
-  });
-
+  console.log("in comments", image)
   return (
     <section className={styles.comments}>
       <section className={styles.imageDescriptionWrapper}>
@@ -36,7 +25,7 @@ export const Comments = ({ image }: IComments): JSX.Element => {
         />
       </section>
       <section className={styles.commentList}>
-        {comments.map((comment) => (
+        {image.comments.comments.map((comment) => (
           <TextEntry
             key={comment.id}
             authorEmail={comment.authorEmail}
@@ -49,21 +38,12 @@ export const Comments = ({ image }: IComments): JSX.Element => {
       <section className={styles.inputWrapper}>
         <Persona size={PersonaSize.size24} styles={personStyles} />
         <TextField onChange={handleChange} styles={textFieldStyles} placeholder="Enter a comment" />
-        <ActionButton onClick={postComment} iconProps={{ iconName: "Send" }} />
+        <ActionButton iconProps={{ iconName: "Send" }} />
       </section>
     </section>
   );
 
-  function postComment() {
-    imageService
-      .postComment(image.id, newCommentText!)
-      .then((res) => {
-        setComments((prev) => [new Comment(res), ...prev]);
-      })
-      .catch(console.error);
-  }
-
   function handleChange(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) {
-    setNewCommentText(newValue);
+    // setNewCommentText(newValue);
   }
 };

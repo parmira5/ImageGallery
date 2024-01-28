@@ -1,7 +1,7 @@
 import { IFileInfo } from "@pnp/sp/files";
-import { IAuthor } from "./IAuthor";
+import { IAuthorObj } from "./IAuthorObj";
 
-export interface IImageServerObj {
+export interface IPostServerObj {
   ID: number;
   Title: string;
   ImageDescription: string;
@@ -9,6 +9,6 @@ export interface IImageServerObj {
   DisableComments: boolean;
   ServerRelativePath: string;
   File: IFileInfo;
-  Author: IAuthor;
+  Author: IAuthorObj;
   Created: string;
 }

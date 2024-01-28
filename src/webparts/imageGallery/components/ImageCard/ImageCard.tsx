@@ -1,70 +1,55 @@
 import * as React from "react";
 import styles from "./ImageCard.module.scss";
-import { ImageHelper } from "@microsoft/sp-image-helper";
 import { Icon, Text } from "@fluentui/react";
 import { chatIconStyles, textStyles } from "./fluentui.styles";
+import { Post } from "../../../../models/Post";
 
 interface IImageOverlay {
-  id: number;
-  title: string;
-  description: string;
-  commentCount: number;
+    id: number;
+    title: string;
+    description: string;
+    commentCount: number;
 }
 
 const ImageOverlay = ({ description, title, id, commentCount }: IImageOverlay): JSX.Element => {
-  return (
-    <div className={styles.imageDetails}>
-      <div className={styles.commentDetails}>
-        <Icon styles={chatIconStyles} iconName="CommentSolid" />
-        <Text styles={textStyles} variant="xLarge">
-          {commentCount}
-        </Text>
-      </div>
-      <Text variant="mediumPlus" styles={textStyles}>
-        {description}
-      </Text>
-    </div>
-  );
+    return (
+        <div className={styles.imageDetails}>
+            <div className={styles.commentDetails}>
+                <Icon styles={chatIconStyles} iconName="CommentSolid" />
+                <Text styles={textStyles} variant="xLarge">
+                    {commentCount}
+                </Text>
+            </div>
+            <Text variant="mediumPlus" styles={textStyles}>
+                {description}
+            </Text>
+        </div>
+    );
 };
 
 interface IImageCard {
-  id: number;
-  src: string;
-  title: string;
-  description: string;
-  commentCount: number;
-  onClick(imageId: number): void;
-  fetchImageCommentCount(imageId: number): void;
+    id: number;
+    post: Post;
+    onClick(post: Post): void;
 }
 
 const ImageCard = ({
-  src,
-  description,
-  title,
-  id,
-  commentCount,
-  onClick,
-  fetchImageCommentCount,
+    id,
+    post,
+    onClick,
 }: IImageCard): JSX.Element => {
-  React.useEffect(() => {
-    fetchImageCommentCount(id);
-  }, []);
+    return (
+        <div tabIndex={0} className={styles.imageCard} onClick={handeImageCardClick}>
+            <ImageOverlay id={id} description={post.description} title={post.title} commentCount={post.comments.commentCount} />
+            <img src={post.imageThumbnailPath} alt="Test" />
+        </div>
+    );
 
-  const resizedImage = ImageHelper.convertToImageUrl({
-    sourceUrl: src,
-    width: 400,
-    height: 500,
-  });
-  return (
-    <div tabIndex={0} className={styles.imageCard} onClick={handeImageCardClick}>
-      <ImageOverlay id={id} description={description} title={title} commentCount={commentCount} />
-      <img src={resizedImage} alt="Test" />
-    </div>
-  );
-
-  function handeImageCardClick(): void {
-    onClick(id);
-  }
+    function handeImageCardClick(): void {
+        onClick(post);
+    }
 };
 
-export default ImageCard;
+export default React.memo(ImageCard, (prevProps, newProps) => {
+    return (prevProps.post.comments.commentCount === newProps.post.comments.commentCount && prevProps.post.description === newProps.post.description && prevProps.id === newProps.id && prevProps.post.imagePath === newProps.post.imagePath)
+});

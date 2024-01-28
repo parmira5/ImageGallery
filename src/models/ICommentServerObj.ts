@@ -6,6 +6,8 @@ export interface ICommentServerObj {
   text: string;
   author: IAuthorServerObj;
   replyCount: number;
+  parentId: number;
+  itemId: number;
 }
 
 interface IAuthorServerObj {

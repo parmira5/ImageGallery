@@ -1,12 +1,12 @@
 import * as React from "react";
 import { commentTextStyles } from "./fluentui.styles";
-import { Comment } from "../../../../models/Comment";
+import { CommentObj } from "../../../../models/CommentObj";
 import { formatDistanceToNow } from "date-fns";
 import { Persona, PersonaSize, Text } from "@fluentui/react";
 import styles from "./Comments.module.scss";
 
 interface ICommentComponent {
-  comment: Comment;
+  comment: CommentObj;
 }
 
 export const CommentItem = ({ comment }: ICommentComponent): JSX.Element => {

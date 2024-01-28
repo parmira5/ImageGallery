@@ -1,7 +1,7 @@
 import { ICommentInfo } from "@pnp/sp/comments";
 import { ICommentServerObj } from "./ICommentServerObj";
 
-export class Comment {
+export class CommentObj {
   createdDate: string;
   id: string;
   isLikedByUser: boolean;
