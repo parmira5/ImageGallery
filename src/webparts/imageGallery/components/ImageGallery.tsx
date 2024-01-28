@@ -5,7 +5,13 @@ import { imageService } from "../../../services/imageService";
 import { Post } from "../../../models/Post";
 import { Comments } from "./Comments/Comments";
 
-import { ActionButton, Panel, PanelType, Pivot, PivotItem } from "@fluentui/react";
+import {
+  ActionButton,
+  Panel,
+  PanelType,
+  Pivot,
+  PivotItem,
+} from "@fluentui/react";
 import { panelStyles, pivotStyles } from "./fluentui.styles";
 
 const ImageGallery = (): JSX.Element => {
@@ -15,9 +21,9 @@ const ImageGallery = (): JSX.Element => {
 
   React.useEffect(() => {
     if (!isOpen) {
-      getPosts().catch(console.error)
+      getPosts().catch(console.error);
     }
-  }, []);
+  }, [isOpen]);
 
   return (
     <div className={styles.imageGallery}>
@@ -47,8 +53,14 @@ const ImageGallery = (): JSX.Element => {
         customWidth="100%"
       >
         <section className={styles.fullSizeContainer}>
-          <img className={styles.fullSizeImage} src={selectedPost?.imagePath} alt="todo" />
-          <div style={{ backgroundColor: "white", width: "500px", height: "100%" }}>
+          <img
+            className={styles.fullSizeImage}
+            src={selectedPost?.imagePath}
+            alt="todo"
+          />
+          <div
+            style={{ backgroundColor: "white", width: "500px", height: "100%" }}
+          >
             {selectedPost?.id && <Comments image={selectedPost} />}
           </div>
         </section>
@@ -57,11 +69,15 @@ const ImageGallery = (): JSX.Element => {
   );
 
   async function getPosts(): Promise<void> {
-    imageService.getImages().then(res => setPosts(res)).catch(console.error)
+    imageService
+      .getImages()
+      .then((res) => setPosts(res))
+      .catch(console.error);
   }
 
   function handleClickImage(post: Post): void {
-    setSelectedPost(post)
+    setIsOpen(true);
+    setSelectedPost(post);
   }
 };
 
