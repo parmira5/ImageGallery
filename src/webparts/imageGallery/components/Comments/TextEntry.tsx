@@ -22,9 +22,9 @@ export const TextEntry = ({
   const imageUrl = `https://r3v365.sharepoint.com/_layouts/15/userphoto.aspx?size=S&username=${authorEmail}`;
   const separatorStyles = separator
     ? {
-        paddingBottom: "8px",
-        borderBottom: "1px solid #EBEBEB",
-      }
+      paddingBottom: "8px",
+      borderBottom: "1px solid #EBEBEB",
+    }
     : undefined;
   return (
     <section className={styles.comment} style={separatorStyles}>
@@ -35,7 +35,6 @@ export const TextEntry = ({
         </Text>
         <Text variant="smallPlus">{createdDate && formatDistanceToNow(new Date(createdDate))} ago</Text>
       </div>
-      <hr />
     </section>
   );
 };

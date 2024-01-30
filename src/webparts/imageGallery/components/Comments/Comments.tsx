@@ -73,7 +73,7 @@ export const Comments = ({ image }: IComments): JSX.Element => {
   }
 
   function handleInfiniteScroll() {
-    if (comments.nextPage)
+    if (comments.hasNext)
       imageService
         .getComments(image.id, comments.nextPage)
         .then((res) => {
