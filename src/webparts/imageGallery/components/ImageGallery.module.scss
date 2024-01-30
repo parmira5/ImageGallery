@@ -24,16 +24,49 @@
   object-fit: contain;
   max-width: 900px;
   max-height: 100%;
+  min-width: 0;
   flex-basis: content;
   background-color: rgba(0, 0, 0, 0.25);
 }
 
-.fullSizeContainer {
+.postWrapper {
   width: 100%;
-  height: 95%;
+  height: calc(100% - 50px);
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
+  min-width: 0;
+  margin: 30px auto;
 }
+
+.commentsWrapper {
+  background-color: white;
+  width: 500px;
+  min-width: 0;
+}
+
+@media screen and (max-width: 1280px) {
+
+  .postWrapper {
+    flex-direction: "column";
+    justify-content: "start";
+    height: calc(100vh - 50px);
+    margin: 0;
+  }
+
+  .fullSizeImage {
+    margin: auto;
+  }
+
+  .commentsWrapper {
+    width: 100%;
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+}
+
+
+@media screen {}

@@ -8,6 +8,7 @@ import "@pnp/sp/items";
 import "@pnp/sp/files";
 import "@pnp/sp/comments";
 import "@pnp/sp/batching";
+import "@pnp/sp/fields";
 
 import { Post } from "../models/Post";
 import { IPostServerObj } from "../models/IPostServerObj";
@@ -39,42 +40,47 @@ export class ImageService {
     });
   }
 
-  public async getImages(): Promise<Post[]> {
+  public async getImages(category?: string): Promise<Post[]> {
     // const [batchedWeb, execute] = this._sp.batched();
+    const categoryFilter = category ? `ImageCategory eq '${category}'` : "";
     const selectFields: (
       | keyof IPostServerObj
       | "Author/EMail"
       | "Author/Title"
     )[] = [
-      "Title",
-      "ImageDescription",
-      "ID",
-      "ImageCategory",
-      "DisableComments",
-      "File",
-      "Author/Title",
-      "Author/EMail",
-      "Created",
-    ];
+        "Title",
+        "ImageDescription",
+        "ID",
+        "ImageCategory",
+        "DisableComments",
+        "File",
+        "Author/Title",
+        "Author/EMail",
+        "Created",
+        "ImageWidth",
+        "ImageHeight"
+      ];
     const res = await this._sp.web.lists
       .getByTitle("Image Gallery")
       .items.select(selectFields.join(", "))
+      .filter(categoryFilter)
       .expand("File, Author")<IPostServerObj[]>();
 
     const posts = res.map((res) => new Post(res));
+
     const commentRepos = await this.batchGetCommentCount(
       posts.map((post) => post.id)
-    ).catch(console.error);
+    )
+
     posts.forEach((post) => {
       post.comments = new CommentsRepository(
         find(
-          commentRepos!,
+          commentRepos,
           (commentRepo: ICommentsServerObj) =>
-            commentRepo.value[0]?.itemId == post.id
+            commentRepo.value[0]?.itemId === post.id
         )
       );
     });
-    console.log(posts);
     return posts;
   }
 
@@ -127,7 +133,7 @@ export class ImageService {
       }
     );
     const resp = await res.text();
-    return resp
+    const parsed = resp
       .split("\n")
       .filter((item) => {
         try {
@@ -138,7 +144,16 @@ export class ImageService {
         }
       })
       .map((item) => JSON.parse(item)) as ICommentsServerObj[];
+    return parsed
+  }
+
+  public async getCategories(): Promise<string[]> {
+    const fields = await this._sp.web.lists.getByTitle("Image Gallery").fields.getByTitle("ImageCategory").select("Choices")()
+    if (fields.Choices) return fields.Choices;
+    return []
   }
 }
+
+
 
 export const imageService = new ImageService();

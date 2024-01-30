@@ -11,4 +11,6 @@ export interface IPostServerObj {
   File: IFileInfo;
   Author: IAuthorObj;
   Created: string;
+  ImageWidth: number;
+  ImageHeight: number
 }

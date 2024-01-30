@@ -16,6 +16,16 @@ export const panelStyles: Partial<IPanelStyles> = {
   subComponentStyles: { closeButton: { root: { color: "white" } } },
   scrollableContent: {
     height: "100%",
-    ".ms-Panel-content": { height: "90%", display: "flex", justifyContent: "stretch", boxSizing: "border-box" },
-  },
+    display: "flex",
+    flexDirection: "column",
+    ".ms-Panel-content": {
+      height: "calc(100vh - 50px)",
+      boxSizing: "border-box",
+      flexGrow: 1,
+      "@media (max-width: 1280px)": {
+        paddingLeft: 0,
+        paddingRight: 0
+      }
+    },
+  }
 };
