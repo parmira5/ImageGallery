@@ -17,7 +17,7 @@ export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick 
       <div className={styles.bannerPhoto}>
         <div className={styles.bannerContentContainer}>
           <img className={styles.profilePhoto} src={userService.getCurrentUserPhoto("L")} />
-          <Text styles={mobileUsernameStyles} variant="large">
+          <Text styles={mobileUsernameStyles} variant="xLarge">
             {userService.currentUser().displayName}
           </Text>
           <PrimaryButton
