@@ -1,103 +1,134 @@
 import * as React from "react";
 import styles from "./ImageGallery.module.scss";
-import ImageCard from "./ImageCard/ImageCard";
-import { imageService } from "../../../services/imageService";
-import { Post } from "../../../models/Post";
-import { Comments } from "./Comments/Comments";
+import { cloneDeep, find } from "@microsoft/sp-lodash-subset";
 
-import {
-  ActionButton,
-  Panel,
-  PanelType,
-  Pivot,
-  PivotItem,
-} from "@fluentui/react";
-import { panelStyles, pivotStyles } from "./fluentui.styles";
+import { ALL } from "./strings";
+import { Post } from "../../../models/Post";
+import { PostsRepository } from "../../../models/PostsRepository";
+import { CommentsRepository } from "../../../models/CommentsRepository";
+import { ICommentsServerObj } from "../../../models/ICommentsServerObj";
+
+import { imageService } from "../../../services/imageService";
+import { userService } from "../../../services/userService";
+import { configService } from "../../../services/configService";
+
+import { AdminConfig } from "./AdminConfig/AdminConfig";
+import { ImageViewer } from "./ImageViewer/ImageViewer";
+import { ImageGrid } from "./ImageGrid/ImageGrid";
+import { GalleryHeader } from "./GalleryHeader/GalleryHeader";
 
 const ImageGallery = (): JSX.Element => {
-  const [posts, setPosts] = React.useState<Post[]>([]);
-  const [selectedPost, setSelectedPost] = React.useState<Post>();
+  const [posts, setPosts] = React.useState<PostsRepository>(new PostsRepository());
+  const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
   const [categories, setCategories] = React.useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState<string>(ALL);
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  const [isImageViewerOpen, setIsImageViewerOpen] = React.useState(false);
+  const [isAdminPanelOpen, setIsAdminPanelOpen] = React.useState(false);
+  const [isCommentsDisabled, setIsCommentsDisabled] = React.useState(true);
+  const { getNext, hasNext, results } = posts;
 
   React.useEffect(() => {
-    if (!isOpen) {
-      getPosts(selectedCategory).catch(console.error);
-    }
-  }, [isOpen, selectedCategory]);
+    (async () => {
+      const _posts = await getPosts(selectedCategory);
+      await configService.getConfig();
+      if (!configService.commentsDisabled) {
+        setIsCommentsDisabled(configService.commentsDisabled);
+        getCommentCounts(_posts.results.map((post) => post.id)).catch(console.error);
+      }
+      userService.currentUserHasFullControlOnImageList().then(setIsAdmin).catch(console.error);
+      imageService.getCategories().then(setCategories).catch(console.error);
+    })();
+  }, []);
 
-  React.useEffect(() => {
-    imageService.getCategories().then(setCategories).catch(console.error)
-  }, [])
+  categories;
+  isAdmin;
 
   return (
-    <div className={styles.imageGallery}>
-      <section>
-        <ActionButton iconProps={{ iconName: "Photo" }} text="Submit a Photo" />
-        <Pivot selectedKey={selectedCategory} styles={pivotStyles} onLinkClick={handleCategoryClick} headersOnly overflowBehavior="menu">
-          <PivotItem itemKey="All" headerText="All" />
-          {categories.map(cat => <PivotItem key={cat} itemKey={cat} headerText={cat} />)}
-        </Pivot>
-      </section>
-      <section className={styles.imageGridWrapper}>
-        {posts.map((post) => (
-          <ImageCard
-            key={post.id}
-            onClick={handleClickImage}
-            id={post.id}
-            post={post}
-          />
-        ))}
-      </section>
-      <Panel
-        styles={panelStyles}
-        isOpen={isOpen}
-        onDismiss={() => setIsOpen(false)}
-        type={PanelType.custom}
-        customWidth="100%"
-      >
-        <section className={styles.postWrapper}>
-          <img
-            className={styles.fullSizeImage}
-            src={selectedPost?.imagePath}
-            alt="todo"
-            width={selectedPost?.imageWidth}
-            height={selectedPost?.imageHeight}
-          />
-          <div className={styles.commentsWrapper}>
-            {selectedPost?.id && <Comments image={selectedPost} />}
-          </div>
-        </section>
-      </Panel>
-    </div>
+    <React.Fragment>
+      <GalleryHeader
+        onSettingsButtonClick={toggleAdminPanel}
+        onSubmitPhotoButtonClick={() => {
+          console.log("submit");
+        }}
+      />
+      <div className={styles.imageGallery}>
+        <ImageGrid posts={posts} onClickItem={handleClickImage} onClickMore={handleLoadMore} />
+        <ImageViewer
+          isOpen={isImageViewerOpen}
+          onDismiss={toggleImagePanel}
+          selectedPost={selectedPost}
+          hideComments={isCommentsDisabled}
+        />
+        <AdminConfig isOpen={isAdminPanelOpen} onDismiss={toggleAdminPanel} />
+      </div>
+    </React.Fragment>
   );
 
-  async function getPosts(selectedCategory: string): Promise<void> {
-    if (selectedCategory === "All") {
-      imageService
-        .getImages()
-        .then((res) => setPosts(res))
-        .catch(console.error);
-    } else {
-      imageService
-        .getImages(selectedCategory)
-        .then((res) => setPosts(res))
-        .catch(console.error);
-    }
+  async function getCommentCounts(postIds: number[]): Promise<void> {
+    const commentCounts = await imageService.batchGetCommentCount(postIds);
+    setPosts((prev) => {
+      const posts = cloneDeep(prev);
+      posts.results = setCommentCount(posts.results, commentCounts);
+      return posts;
+    });
   }
 
+  async function getPosts(selectedCategory: string): Promise<PostsRepository> {
+    const _posts: PostsRepository =
+      selectedCategory === ALL ? await imageService.getImages() : await imageService.getImages(selectedCategory);
+    setPosts(_posts);
+    return _posts;
+  }
+
+  // function handleCategoryClick(item: PivotItem): void {
+  //   if (item.props && item.props.itemKey) {
+  //     setSelectedCategory(item.props.itemKey);
+  //     getPosts(item.props.itemKey).catch(console.error);
+  //     if (!isCommentsDisabled) {
+  //       getCommentCounts(results.map((post) => post.id)).catch(console.error);
+  //     }
+  //   }
+  // }
+
   function handleClickImage(post: Post): void {
-    setIsOpen(true);
+    toggleImagePanel();
+    setSelectedCategory("ALL");
     setSelectedPost(post);
   }
 
-  function handleCategoryClick(item?: PivotItem): void {
-    if (item && item.props.itemKey) {
-      setSelectedCategory(item.props.itemKey)
-    } else {
-      setSelectedCategory("All")
+  async function handleLoadMore(): Promise<void> {
+    if (hasNext && getNext) {
+      const nextSet = await getNext();
+      if (nextSet) {
+        const _postRepo = new PostsRepository(nextSet);
+        if (!isCommentsDisabled) {
+          const commentCounts = await imageService.batchGetCommentCount(_postRepo.results.map((post) => post.id));
+          const updatedPosts = setCommentCount(_postRepo.results, commentCounts);
+          setPosts((prev) => ({ ..._postRepo, results: [...prev.results, ...updatedPosts] }));
+        } else {
+          setPosts((prev) => ({ ..._postRepo, results: [...prev.results, ..._postRepo.results] }));
+        }
+      }
     }
+  }
+
+  function setCommentCount(posts: Post[], commentCounts: ICommentsServerObj[]): Post[] {
+    return posts.map((post) => {
+      post.comments = new CommentsRepository(
+        find(commentCounts, (commentRepo: ICommentsServerObj) => commentRepo.value[0]?.itemId === post.id)
+      );
+      return post;
+    });
+  }
+
+  function toggleAdminPanel(): void {
+    setIsAdminPanelOpen((prev) => !prev);
+  }
+
+  function toggleImagePanel(): void {
+    if (isImageViewerOpen && !isCommentsDisabled) getCommentCounts(results.map((post) => post.id)).catch(console.error);
+    setIsImageViewerOpen((prev) => !prev);
   }
 };
 

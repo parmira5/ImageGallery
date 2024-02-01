@@ -2,6 +2,7 @@ import { ServiceKey, ServiceScope } from "@microsoft/sp-core-library";
 import { Guid } from "@microsoft/sp-core-library";
 import { PageContext } from "@microsoft/sp-page-context";
 import { spfi, SPFI, SPFx as spSPFx } from "@pnp/sp";
+import { InjectHeaders } from "@pnp/queryable";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
@@ -10,25 +11,25 @@ import "@pnp/sp/comments";
 import "@pnp/sp/batching";
 import "@pnp/sp/fields";
 
-import { Post } from "../models/Post";
 import { IPostServerObj } from "../models/IPostServerObj";
 import { IComment, ICommentInfo } from "@pnp/sp/comments";
 
 import { SPHttpClient } from "@microsoft/sp-http-base";
 import { ICommentsServerObj } from "../models/ICommentsServerObj";
 import { CommentsRepository } from "../models/CommentsRepository";
-import { find } from "@microsoft/sp-lodash-subset";
-// import { find } from "@microsoft/sp-lodash-subset";
+import { PostsRepository } from "../models/PostsRepository";
 
 export interface IImageService {
-  getImages(): Promise<Post[]>;
+  getImages(): Promise<PostsRepository>;
   getComments(imageId: number, nextPage?: string): Promise<CommentsRepository>;
   postComment(imageId: number, text: string): Promise<IComment & ICommentInfo>;
 }
 
 export class ImageService {
-  public static readonly serviceKey: ServiceKey<IImageService> =
-    ServiceKey.create<IImageService>("SPFx:SampleService", ImageService);
+  public static readonly serviceKey: ServiceKey<IImageService> = ServiceKey.create<IImageService>(
+    "SPFx:SampleService",
+    ImageService
+  );
   private _sp: SPFI;
   private _spHttpClient: SPHttpClient;
 
@@ -40,78 +41,48 @@ export class ImageService {
     });
   }
 
-  public async getImages(category?: string): Promise<Post[]> {
-    // const [batchedWeb, execute] = this._sp.batched();
+  public async getImages(category?: string): Promise<PostsRepository> {
     const categoryFilter = category ? `ImageCategory eq '${category}'` : "";
-    const selectFields: (
-      | keyof IPostServerObj
-      | "Author/EMail"
-      | "Author/Title"
-    )[] = [
-        "Title",
-        "ImageDescription",
-        "ID",
-        "ImageCategory",
-        "DisableComments",
-        "File",
-        "Author/Title",
-        "Author/EMail",
-        "Created",
-        "ImageWidth",
-        "ImageHeight"
-      ];
+    const selectFields: (keyof IPostServerObj | "Author/EMail" | "Author/Title")[] = [
+      "Title",
+      "ImageDescription",
+      "ID",
+      "ImageCategory",
+      "DisableComments",
+      "File",
+      "Author/Title",
+      "Author/EMail",
+      "Created",
+      "ImageWidth",
+      "ImageHeight",
+    ];
     const res = await this._sp.web.lists
+      .using(InjectHeaders({ Accept: "application/json;odata=minimalmetadata" }))
       .getByTitle("Image Gallery")
       .items.select(selectFields.join(", "))
       .filter(categoryFilter)
-      .expand("File, Author")<IPostServerObj[]>();
+      .top(9)
+      .expand("File, Author")
+      .orderBy("Created", false)
+      .getPaged<IPostServerObj[]>();
 
-    const posts = res.map((res) => new Post(res));
-
-    const commentRepos = await this.batchGetCommentCount(
-      posts.map((post) => post.id)
-    )
-
-    posts.forEach((post) => {
-      post.comments = new CommentsRepository(
-        find(
-          commentRepos,
-          (commentRepo: ICommentsServerObj) =>
-            commentRepo.value[0]?.itemId === post.id
-        )
-      );
-    });
-    return posts;
+    return new PostsRepository(res);
   }
 
-  public async getComments(
-    imageId: number,
-    nextPage?: string
-  ): Promise<CommentsRepository> {
+  public async getComments(imageId: number, nextPage?: string): Promise<CommentsRepository> {
     const uri =
       nextPage ||
       `https://r3v365.sharepoint.com/sites/NEWSSITE2/_api/web/lists/getByTitle('Image Gallery')/items('${imageId}')/comments?$inlineCount=AllPages&$top=15`;
-    const res = await this._spHttpClient.get(
-      uri,
-      SPHttpClient.configurations.v1
-    );
+    const res = await this._spHttpClient.get(uri, SPHttpClient.configurations.v1);
     const json = (await res.json()) as ICommentsServerObj;
     return new CommentsRepository(json);
   }
 
-  public async postComment(
-    imageId: number,
-    text: string
-  ): Promise<IComment & ICommentInfo> {
-    return this._sp.web.lists
-      .getByTitle("Image Gallery")
-      .items.getById(imageId)
-      .comments.add(text);
+  public async postComment(imageId: number, text: string): Promise<IComment & ICommentInfo> {
+    return this._sp.web.lists.getByTitle("Image Gallery").items.getById(imageId).comments.add(text);
   }
 
-  private async batchGetCommentCount(
-    postIds: number[]
-  ): Promise<ICommentsServerObj[]> {
+  public async batchGetCommentCount(postIds: number[]): Promise<ICommentsServerObj[]> {
     const batchId = Guid.newGuid().toString();
     const batchIdentifierTemplate = `--batch_${batchId}\nContent-type: application/http\nContent-Transfer-Encoding: binary`;
     const requestTemplate = `GET https://r3v365.sharepoint.com/sites/NEWSSITE2/_api/web/lists/getByTitle('<<LIST>>')/items(<<ID>>)/comments?$inlineCount=AllPages&%24top=1 HTTP/1.1\naccept: application/json`;
@@ -144,16 +115,17 @@ export class ImageService {
         }
       })
       .map((item) => JSON.parse(item)) as ICommentsServerObj[];
-    return parsed
+    return parsed;
   }
 
   public async getCategories(): Promise<string[]> {
-    const fields = await this._sp.web.lists.getByTitle("Image Gallery").fields.getByTitle("ImageCategory").select("Choices")()
+    const fields = await this._sp.web.lists
+      .getByTitle("Image Gallery")
+      .fields.getByTitle("ImageCategory")
+      .select("Choices")();
     if (fields.Choices) return fields.Choices;
-    return []
+    return [];
   }
 }
-
-
 
 export const imageService = new ImageService();

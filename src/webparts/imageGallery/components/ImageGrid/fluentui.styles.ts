@@ -1,4 +1,14 @@
-import { IPanelStyles } from "@fluentui/react";
+import { IButtonStyles, IPanelStyles, IPivotStyles } from "@fluentui/react";
+
+export const pivotStyles: Partial<IPivotStyles> = {
+  root: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+    borderBottom: "1px solid #EBEBEB",
+  },
+};
 
 export const panelStyles: Partial<IPanelStyles> = {
   main: { backgroundColor: "rgba(0,0,0,0.85)" },
@@ -13,10 +23,11 @@ export const panelStyles: Partial<IPanelStyles> = {
       boxSizing: "border-box",
       flexGrow: 1,
       "@media (max-width: 1280px)": {
-        overflowY: "hidden",
         paddingLeft: 0,
         paddingRight: 0,
       },
     },
   },
 };
+
+export const pageBtnStyles: Partial<IButtonStyles> = { root: { alignSelf: "center" } };

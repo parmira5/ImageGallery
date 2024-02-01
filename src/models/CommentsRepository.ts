@@ -12,7 +12,7 @@ export class CommentsRepository {
     this.commentCount = comments?.["@odata.count"] || 0;
   }
 
-  get hasNext() {
-    return this.comments.length < this.commentCount
+  get hasNext(): boolean {
+    return this.comments.length < this.commentCount;
   }
 }

@@ -11,3 +11,7 @@ export const personStyles: Partial<IPersonaStyles> = {
 export const commentTextStyles: Partial<ITextStyles> = {
   root: { flexGrow: 1 },
 };
+
+export const dateTextStyles: Partial<ITextStyles> = {
+  root: { color: "[theme:neutralLighter, default:#f4f4f4]" },
+};

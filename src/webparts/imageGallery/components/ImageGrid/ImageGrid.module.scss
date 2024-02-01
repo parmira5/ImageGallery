@@ -1,0 +1,14 @@
+.imageGridWrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    flex-wrap: wrap;
+  }
+
+
+  @media screen and (max-width: 1280px) {
+    .imageGridWrapper {
+        gap: .5px;
+    }
+  
+  }

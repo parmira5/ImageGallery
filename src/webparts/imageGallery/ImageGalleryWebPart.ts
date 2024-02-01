@@ -9,6 +9,8 @@ import * as strings from "ImageGalleryWebPartStrings";
 import ImageGallery from "./components/ImageGallery";
 import { IImageGalleryProps } from "./components/IImageGalleryProps";
 import { imageService } from "../../services/imageService";
+import { userService } from "../../services/userService";
+import { configService } from "../../services/configService";
 
 export interface IImageGalleryWebPartProps {
   description: string;
@@ -32,6 +34,8 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
 
   protected onInit(): Promise<void> {
     imageService.init(this.context.serviceScope, this.context.spHttpClient);
+    userService.init(this.context.serviceScope, this.context.spHttpClient);
+    configService.init(this.context.serviceScope, this.context.spHttpClient);
     return this._getEnvironmentMessage().then((message) => {
       this._environmentMessage = message;
     });

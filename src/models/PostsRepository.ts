@@ -1,15 +1,15 @@
+import { PagedItemCollection } from "@pnp/sp/items";
+import { IPostServerObj } from "./IPostServerObj";
 import { Post } from "./Post";
-import { findIndex } from "@microsoft/sp-lodash-subset";
 
 export class PostsRepository {
-    items: Post[]
+  results: Post[];
+  getNext: (() => Promise<PagedItemCollection<IPostServerObj[]> | null>) | undefined;
+  hasNext: boolean;
 
-    constructor(_posts?: Post[]) {
-        this.items = _posts || [];
-    }
-
-    public updatePost(post: Post) {
-        let i = findIndex(this.items, (_post) => post.id === _post.id)
-        this.items[i] = post;
-    }
+  constructor(_posts?: PagedItemCollection<IPostServerObj[]>) {
+    this.results = _posts?.results?.map((_post) => new Post(_post)) || [];
+    this.getNext = _posts?.getNext.bind(_posts);
+    this.hasNext = !!_posts?.hasNext;
+  }
 }

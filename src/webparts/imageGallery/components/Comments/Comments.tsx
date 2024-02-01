@@ -1,25 +1,30 @@
 import * as React from "react";
-// import { imageService } from "../../../../services/imageService";
-import { TextEntry } from "./TextEntry";
-import { ActionButton, Persona, PersonaSize, TextField } from "@fluentui/react";
 import styles from "./Comments.module.scss";
-import { personStyles, textFieldStyles } from "./fluentui.styles";
-import { Post } from "../../../../models/Post";
-import { imageService } from "../../../../services/imageService";
-import { CommentsRepository } from "../../../../models/CommentsRepository";
 import InfiniteScroll from "react-infinite-scroller";
-import { cloneDeep } from "@microsoft/sp-lodash-subset";
+import { useWindowSize } from "usehooks-ts";
+
+import { ActionButton, Persona, PersonaSize, TextField } from "@fluentui/react";
+import { personStyles, textFieldStyles } from "./fluentui.styles";
+
+import { TextEntry } from "./TextEntry";
+
+import { Post } from "../../../../models/Post";
+import { CommentsRepository } from "../../../../models/CommentsRepository";
+import { imageService } from "../../../../services/imageService";
+import { userService } from "../../../../services/userService";
 
 interface IComments {
   image: Post;
 }
 
-export const Comments = ({ image }: IComments): JSX.Element => {
+export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefObject<HTMLElement>): JSX.Element => {
   const [commentText, setCommentText] = React.useState("");
   const [comments, setComments] = React.useState<CommentsRepository>(new CommentsRepository());
+  const windowSize = useWindowSize();
+  const isMobileLayout = windowSize.width < 1281;
 
   React.useEffect(() => {
-    updateComments();
+    (async () => await updateComments())();
   }, []);
 
   return (
@@ -33,13 +38,14 @@ export const Comments = ({ image }: IComments): JSX.Element => {
           separator
         />
       </section>
-      <section key={comments.commentCount} style={{ flexGrow: 1, overflow: "auto" }}>
+      <section style={{ flexGrow: 1, overflow: "auto" }}>
         <InfiniteScroll
           pageStart={0}
           className={styles.commentList}
           loadMore={handleInfiniteScroll}
           hasMore={comments.comments.length < comments.commentCount}
           useWindow={false}
+          getScrollParent={isMobileLayout ? () => ref.current : undefined}
         >
           {comments.comments.map((comment) => (
             <TextEntry
@@ -53,7 +59,7 @@ export const Comments = ({ image }: IComments): JSX.Element => {
         </InfiniteScroll>
       </section>
       <section className={styles.inputWrapper}>
-        <Persona size={PersonaSize.size24} styles={personStyles} />
+        <Persona size={PersonaSize.size24} styles={personStyles} imageUrl={userService.getCurrentUserPhoto()} />
         <TextField
           onChange={handleChange}
           styles={textFieldStyles}
@@ -66,43 +72,52 @@ export const Comments = ({ image }: IComments): JSX.Element => {
     </section>
   );
 
-  function handleChange(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) {
+  function handleChange(
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ): void {
     if (newValue) {
       setCommentText(newValue);
     }
   }
 
-  function handleInfiniteScroll() {
-    if (comments.hasNext)
-      imageService
-        .getComments(image.id, comments.nextPage)
-        .then((res) => {
-          const _comments = cloneDeep(comments);
-          _comments.comments = [...comments.comments, ...res.comments];
-          _comments.nextPage = res.nextPage;
-          setComments(_comments);
-        })
-        .catch(console.error);
+  async function handleInfiniteScroll(): Promise<void> {
+    try {
+      if (comments.hasNext) {
+        const nextPage = await imageService.getComments(image.id, comments.nextPage);
+        const prevComments = [...comments.comments];
+        nextPage.comments = [...prevComments, ...nextPage.comments];
+        setComments(nextPage);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(): Promise<void> {
+    if (ref && ref.current) {
+      ref.current.scrollTop = 0;
+    }
     imageService.postComment(image.id, commentText).then(updateComments).catch(console.error);
     setCommentText("");
   }
 
-  async function handleKeyUp(e: React.KeyboardEvent) {
+  async function handleKeyUp(e: React.KeyboardEvent): Promise<void> {
     if (e.key === "Enter") {
+      if (ref && ref.current) {
+        ref.current.scrollTop = 0;
+      }
       imageService.postComment(image.id, commentText).then(updateComments).catch(console.error);
       setCommentText("");
     }
   }
 
-  function updateComments() {
-    imageService
-      .getComments(image.id)
-      .then((res) => {
-        setComments(res);
-      })
-      .catch(console.error);
+  async function updateComments(): Promise<void> {
+    try {
+      const res = await imageService.getComments(image.id);
+      setComments(res);
+    } catch (error) {
+      console.error(error);
+    }
   }
-};
+});

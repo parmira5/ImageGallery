@@ -1,0 +1,97 @@
+.galleryHeader {
+    display: block;
+    width: 100%;
+    margin: auto;
+    flex-wrap: wrap;
+    background-color: "[theme:white, default:#white]";
+    margin-bottom: 1.5em;
+    box-sizing: border-box;
+}
+
+.bannerPhoto {
+    width: 100%;
+    height: 200px;
+    background-image: url('https://r3v365.sharepoint.com/sites/NEWSSITE2/SiteAssets/user-default-1.png');
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+}
+
+.controlPanel {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 980px;
+    margin: auto;   
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: end;
+    height: 32px;
+}
+
+.bannerContentContainer {
+    display: flex;
+    width: 100%;
+    max-width: 980px;
+    margin: auto
+}
+
+.profilePhoto {
+    position: relative;
+    top: 60px;
+    left: -4px;
+    height: 125px;
+    width: 125px;
+    border-radius: 50%;
+    margin-right: 12px;
+    border-width: 10px;
+    border-color: "[theme:white, default:#white]";
+    border-style: solid;
+}
+
+.postCount {
+    font-weight: 500;
+    margin-right: 12px;
+    text-align: center;
+}
+
+@media screen and (max-width: 1280px) {
+    .galleryHeader {
+        width: 100%;
+    }
+
+    .bannerPhoto {
+        height: 165px;
+        margin-bottom: 42px;
+    }
+
+    .bannerContentContainer {
+        padding-left: 14px;
+    }
+
+    .controlPanel {
+        padding-right: 14px;
+    }
+
+    .profilePhoto {
+        height: 100px;
+        width: 100px;
+        border-radius: 50%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .galleryHeader {
+        margin-bottom: 12px;
+    }
+    .controlPanel {
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+
+    .profilePhoto {
+        height: 80px;
+        width: 80px;
+    }
+}
