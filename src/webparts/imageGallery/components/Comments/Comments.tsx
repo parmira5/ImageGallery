@@ -4,6 +4,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useWindowSize } from "usehooks-ts";
 
 import { ActionButton, Persona, PersonaSize, TextField } from "@fluentui/react";
+import { useBoolean } from "@fluentui/react-hooks";
 import { personStyles, textFieldStyles } from "./fluentui.styles";
 
 import { TextEntry } from "./TextEntry";
@@ -12,6 +13,7 @@ import { Post } from "../../../../models/Post";
 import { CommentsRepository } from "../../../../models/CommentsRepository";
 import { imageService } from "../../../../services/imageService";
 import { userService } from "../../../../services/userService";
+import { CollapsibleInput } from "../CollapsibleInput/CollapsibleInput";
 
 interface IComments {
   image: Post;
@@ -20,6 +22,7 @@ interface IComments {
 export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefObject<HTMLElement>): JSX.Element => {
   const [commentText, setCommentText] = React.useState("");
   const [comments, setComments] = React.useState<CommentsRepository>(new CommentsRepository());
+  const [isInputOpen, { setTrue: openInput, setFalse: closeInput }] = useBoolean(false);
   const windowSize = useWindowSize();
   const isMobileLayout = windowSize.width < 1281;
 
@@ -39,6 +42,18 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
         />
       </section>
       <section style={{ flexGrow: 1, overflow: "auto" }}>
+        <div className={styles.mobileInputWrapper}>
+          <CollapsibleInput
+            isOpen={isInputOpen}
+            onCancel={handleCollapseInput}
+            onClickExpand={openInput}
+            onSave={handleSubmit}
+            value={commentText}
+            onChangeInput={handleChange}
+            expandButtonText="Write a Comment"
+            placeHolder="Enter a Comment"
+          />
+        </div>
         <InfiniteScroll
           pageStart={0}
           className={styles.commentList}
@@ -119,5 +134,10 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
     } catch (error) {
       console.error(error);
     }
+  }
+
+  function handleCollapseInput() {
+    closeInput();
+    setCommentText("");
   }
 });

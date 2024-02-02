@@ -45,7 +45,7 @@ const ImageGallery = (): JSX.Element => {
   isAdmin;
 
   return (
-    <React.Fragment>
+    <div className={styles.appWrapper}>
       <GalleryHeader
         onSettingsButtonClick={toggleAdminPanel}
         onSubmitPhotoButtonClick={() => {
@@ -62,7 +62,7 @@ const ImageGallery = (): JSX.Element => {
         />
         <AdminConfig isOpen={isAdminPanelOpen} onDismiss={toggleAdminPanel} />
       </div>
-    </React.Fragment>
+    </div>
   );
 
   async function getCommentCounts(postIds: number[]): Promise<void> {
