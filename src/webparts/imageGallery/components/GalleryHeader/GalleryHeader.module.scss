@@ -22,7 +22,7 @@
     width: 100%;
     box-sizing: border-box;
     max-width: 980px;
-    margin: auto;   
+    margin: auto;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -70,10 +70,6 @@
         padding-left: 14px;
     }
 
-    .controlPanel {
-        padding-right: 14px;
-    }
-
     .profilePhoto {
         height: 100px;
         width: 100px;
@@ -85,6 +81,7 @@
     .galleryHeader {
         margin-bottom: 12px;
     }
+
     .controlPanel {
         justify-content: center;
         margin-bottom: 8px;

@@ -9,9 +9,10 @@ import styles from "./GalleryHeader.module.scss";
 interface IProps {
   onSettingsButtonClick: () => void;
   onSubmitPhotoButtonClick: () => void;
+  onPivotClick: (item?: PivotItem) => void;
 }
 
-export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick }: IProps): JSX.Element => {
+export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick, onPivotClick }: IProps): JSX.Element => {
   return (
     <div className={styles.galleryHeader}>
       <div className={styles.bannerPhoto}>
@@ -43,10 +44,10 @@ export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick 
           onClick={onSubmitPhotoButtonClick}
         />
       </div>
-      <Pivot styles={pivotStyles} overflowBehavior="menu">
+      <Pivot styles={pivotStyles} overflowBehavior="menu" onLinkClick={onPivotClick}>
         <PivotItem key={ALL} itemKey={ALL} headerText={ALL} />
-        <PivotItem key={"MINE"} itemKey={"MINE"} headerText={"My Photos"} />
-        <PivotItem key={"TAGGED"} itemKey={"TAGGED"} headerText={"Tagged Photos"} />
+        <PivotItem key={"MINE"} itemKey={"MINE"} headerText={"Mine"} />
+        <PivotItem key={"TAGGED"} itemKey={"TAGGED"} headerText={"Tagged"} />
       </Pivot>
     </div>
   );

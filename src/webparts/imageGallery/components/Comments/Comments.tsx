@@ -10,7 +10,7 @@ import { TextEntry } from "./TextEntry";
 
 import { Post } from "../../../../models/Post";
 import { CommentsRepository } from "../../../../models/CommentsRepository";
-import { imageService } from "../../../../services/imageService";
+import { commentService } from "../../../../services/commenService";
 import { userService } from "../../../../services/userService";
 
 interface IComments {
@@ -84,7 +84,7 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
   async function handleInfiniteScroll(): Promise<void> {
     try {
       if (comments.hasNext) {
-        const nextPage = await imageService.getComments(image.id, comments.nextPage);
+        const nextPage = await commentService.getComments(image.id, comments.nextPage);
         const prevComments = [...comments.comments];
         nextPage.comments = [...prevComments, ...nextPage.comments];
         setComments(nextPage);
@@ -98,7 +98,7 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
     if (ref && ref.current) {
       ref.current.scrollTop = 0;
     }
-    imageService.postComment(image.id, commentText).then(updateComments).catch(console.error);
+    commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
     setCommentText("");
   }
 
@@ -107,14 +107,14 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
       if (ref && ref.current) {
         ref.current.scrollTop = 0;
       }
-      imageService.postComment(image.id, commentText).then(updateComments).catch(console.error);
+      commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
       setCommentText("");
     }
   }
 
   async function updateComments(): Promise<void> {
     try {
-      const res = await imageService.getComments(image.id);
+      const res = await commentService.getComments(image.id);
       setComments(res);
     } catch (error) {
       console.error(error);

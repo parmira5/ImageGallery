@@ -1,7 +1,6 @@
 import { ActionButton } from "@fluentui/react";
 import * as React from "react";
 import { Post } from "../../../../models/Post";
-import { PostsRepository } from "../../../../models/PostsRepository";
 import ImageCard from "../ImageCard/ImageCard";
 import { ImageOverlay } from "../ImageCard/ImageOverlay";
 import { pageBtnIcon } from "./fluentui.props";
@@ -10,16 +9,16 @@ import styles from "./ImageGrid.module.scss";
 import { LOAD_MORE } from "./strings";
 
 interface IProps {
-  posts: PostsRepository;
+  posts: Post[];
+  hasNext: boolean;
   onClickItem: (post: Post) => void;
   onClickMore: () => void;
 }
 
-export const ImageGrid = ({ posts, onClickItem, onClickMore }: IProps): JSX.Element => {
-  const { hasNext, results } = posts;
+export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext }: IProps): JSX.Element => {
   return (
     <section className={styles.imageGridWrapper}>
-      {results.map((post) => (
+      {posts.map((post) => (
         <ImageCard key={post.id} onClick={onClickItem} id={post.id} post={post}>
           <ImageOverlay
             id={post.id}
