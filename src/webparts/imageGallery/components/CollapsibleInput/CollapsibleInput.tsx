@@ -1,6 +1,7 @@
 import { DefaultButton, IButtonProps, PrimaryButton, TextField } from "@fluentui/react";
 import * as React from "react";
 import styles from "./CollapsibleInput.module.scss";
+import { inputStyles } from "./fluentui.styles";
 
 interface IProps {
   isOpen: boolean;
@@ -39,7 +40,7 @@ export const CollapsibleInput = ({
 
   return (
     <div className={styles.collapsibleInput}>
-      <TextField placeholder={placeHolder} multiline value={value} onChange={onChangeInput} />
+      <TextField styles={inputStyles} placeholder={placeHolder} multiline value={value} onChange={onChangeInput} borderless resizable={false} />
       <div className={styles.buttonWrapper}>
         <DefaultButton {...cancelButtonProps} text="Cancel" onClick={onCancel} />
         <PrimaryButton {...saveButtonProps} text="Send" onClick={onSave} />

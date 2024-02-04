@@ -100,7 +100,7 @@ export class ImageService {
     const commentCounts = await commentService.batchGetCommentCount(_posts);
     const postCopy = [..._posts];
     commentCounts.forEach(commentCount => {
-      const i = findIndex(postCopy, (post) => post.id == commentCount.value[0].itemId)
+      const i = findIndex(postCopy, (post) => post.id === commentCount.value[0].itemId)
       postCopy[i].comments = new CommentsRepository(commentCount)
     })
     return postCopy;

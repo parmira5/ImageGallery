@@ -2,7 +2,6 @@ import { ServiceKey, ServiceScope } from "@microsoft/sp-core-library";
 import { Guid } from "@microsoft/sp-core-library";
 import { PageContext } from "@microsoft/sp-page-context";
 import { spfi, SPFx } from "@pnp/sp";
-import { JSONParse } from "@pnp/queryable";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
@@ -15,11 +14,13 @@ import { IComment, ICommentInfo } from "@pnp/sp/comments";
 
 import { SPHttpClient } from "@microsoft/sp-http-base";
 import { ICommentsServerObj } from "../models/ICommentsServerObj";
-import { CommentsRepository } from "../models/CommentsRepository";
 import { Post } from "../models/Post";
+import { configService } from "./configService";
+import { CommentObj } from "../models/CommentObj";
+import { ICommentServerObj } from "../models/ICommentServerObj";
 
 export interface ICommentService {
-    getComments(imageId: number, nextPage?: string): Promise<CommentsRepository>;
+    getComments(imageId: number, nextPage?: string): Promise<CommentObj[]>;
     postComment(imageId: number, text: string): Promise<IComment & ICommentInfo>;
 }
 
@@ -28,20 +29,42 @@ export class CommentService {
         "SPFx:SampleService",
         CommentService
     );
+
     private _spHttpClient: SPHttpClient;
     private _pageContext: PageContext;
+    private _baseQuery: string;
+    private _odataAddOns = "?$inlineCount=AllPages&%24top=15"
+    private _nextLink: string;
+    public hasNext = false;
 
     public init(serviceScope: ServiceScope, spHttpClient: SPHttpClient): void {
         this._spHttpClient = spHttpClient;
         serviceScope.whenFinished(() => {
             this._pageContext = serviceScope.consume(PageContext.serviceKey);
+            this._baseQuery = `${this._pageContext.site.absoluteUrl}/_api/web/lists/getByTitle('${configService._listName}')`;
         });
     }
 
-    public async getComments(imageId: number, nextPage?: string): Promise<CommentsRepository> {
-        const sp = spfi().using(SPFx({ pageContext: this._pageContext }));
-        const res = await sp.web.lists.getByTitle("Image Gallery").items.getById(imageId).using(JSONParse()).comments.top(15)() as ICommentsServerObj;
-        return new CommentsRepository(res);
+    public async getComments(imageId: number, nextPage?: string): Promise<CommentObj[]> {
+        const base = this._baseQuery;
+        const odata = this._odataAddOns;
+        const resp = await this._spHttpClient.get(`${base}/items/getById('${imageId}')/comments${odata}`, SPHttpClient.configurations.v1);
+        const json = await resp.json()
+        this._nextLink = json["@odata.nextLink"] || "";
+        this.hasNext = !!this._nextLink;
+        console.log(this._nextLink)
+        return json.value.map((comment: ICommentServerObj) => new CommentObj(comment))
+    }
+
+    public async getNext(): Promise<CommentObj[]> {
+        if (this._nextLink) {
+            const resp = await this._spHttpClient.get(this._nextLink, SPHttpClient.configurations.v1);
+            const json = await resp.json()
+            this._nextLink = json["@odata.nextLink"] || "";
+            this.hasNext = !!this._nextLink;
+            return json.value.map((comment: ICommentServerObj) => new CommentObj(comment))
+        }
+        else return [];
     }
 
     public async postComment(imageId: number, text: string): Promise<IComment & ICommentInfo> {

@@ -10,10 +10,10 @@ import { personStyles, textFieldStyles } from "./fluentui.styles";
 import { TextEntry } from "./TextEntry";
 
 import { Post } from "../../../../models/Post";
-import { CommentsRepository } from "../../../../models/CommentsRepository";
 import { commentService } from "../../../../services/commenService";
 import { userService } from "../../../../services/userService";
 import { CollapsibleInput } from "../CollapsibleInput/CollapsibleInput";
+import { CommentObj } from "../../../../models/CommentObj";
 
 interface IComments {
   image: Post;
@@ -21,7 +21,7 @@ interface IComments {
 
 export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefObject<HTMLElement>): JSX.Element => {
   const [commentText, setCommentText] = React.useState("");
-  const [comments, setComments] = React.useState<CommentsRepository>(new CommentsRepository());
+  const [comments, setComments] = React.useState<CommentObj[]>([]);
   const [isInputOpen, { setTrue: openInput, setFalse: closeInput }] = useBoolean(false);
   const windowSize = useWindowSize();
   const isMobileLayout = windowSize.width < 1281;
@@ -58,11 +58,11 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
           pageStart={0}
           className={styles.commentList}
           loadMore={handleInfiniteScroll}
-          hasMore={comments.comments.length < comments.commentCount}
+          hasMore={commentService.hasNext}
           useWindow={false}
           getScrollParent={isMobileLayout ? () => ref.current : undefined}
         >
-          {comments.comments.map((comment) => (
+          {comments.map((comment) => (
             <TextEntry
               key={comment.id}
               authorEmail={comment.authorEmail}
@@ -91,18 +91,16 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
   ): void {
-    if (newValue) {
+    if (newValue || newValue === "") {
       setCommentText(newValue);
     }
   }
 
   async function handleInfiniteScroll(): Promise<void> {
     try {
-      if (comments.hasNext) {
-        const nextPage = await commentService.getComments(image.id, comments.nextPage);
-        const prevComments = [...comments.comments];
-        nextPage.comments = [...prevComments, ...nextPage.comments];
-        setComments(nextPage);
+      if (commentService.hasNext) {
+        const nextPage = await commentService.getNext();
+        setComments(prev => ([...prev, ...nextPage]));
       }
     } catch (error) {
       console.error(error);
@@ -110,19 +108,17 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
   }
 
   async function handleSubmit(): Promise<void> {
-    if (ref && ref.current) {
-      ref.current.scrollTop = 0;
+    if (commentText) {
+      commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
+      closeInput();
+      setCommentText("");
     }
-    commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
-    setCommentText("");
   }
 
   async function handleKeyUp(e: React.KeyboardEvent): Promise<void> {
-    if (e.key === "Enter") {
-      if (ref && ref.current) {
-        ref.current.scrollTop = 0;
-      }
+    if (e.key === "Enter" && commentText) {
       commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
+      closeInput();
       setCommentText("");
     }
   }

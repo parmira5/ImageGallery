@@ -2,6 +2,7 @@ import { IPersonaStyles, ITextFieldStyles, ITextStyles } from "@fluentui/react";
 
 export const textFieldStyles: Partial<ITextFieldStyles> = {
   root: { width: "100%" },
+  field: { fontSize: 16 }
 };
 
 export const personStyles: Partial<IPersonaStyles> = {

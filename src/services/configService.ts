@@ -19,12 +19,15 @@ export class ConfigService {
   );
   private _sp: SPFI;
   private _pageContext: PageContext;
-  public commentsDisabled = true;
+  public _listName = "Image Gallery";
+  public _configListName = "Image Gallery Config";
+  public sitePath: string;
 
   public init(serviceScope: ServiceScope, spHttpClient: SPHttpClient): void {
     // this._spHttpClient = spHttpClient;
     serviceScope.whenFinished(() => {
       this._pageContext = serviceScope.consume(PageContext.serviceKey);
+      this.sitePath = this._pageContext.site.absoluteUrl;
       this._sp = spfi()
         .using(SPFx({ pageContext: this._pageContext }))
         .using(InjectHeaders(NO_METADATA));
@@ -37,8 +40,7 @@ export class ConfigService {
       .items.select(selectFields.join(","))
       .orderBy("Created")
       .top(1)();
-    this.commentsDisabled = config[0].DisableAllComments;
-    return config?.[0] || [];
+    return config[0] || [];
   }
 
   public async updateConfig(config: IConfigServerObj): Promise<IConfigServerObj> {

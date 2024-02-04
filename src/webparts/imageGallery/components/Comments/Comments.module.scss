@@ -1,69 +1,68 @@
+.comments {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 10px
+}
 
- .comments {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 10px
-  }
+.inputWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 10px 10px;
+  background-color: "[theme:white, default:#white]"
+}
 
+.mobileInputWrapper {
+  display: none;
+}
+
+.imageDescriptionWrapper {
+  padding: 20px 20px 5px 20px;
+}
+
+.commentList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+  gap: 18px;
+  padding: 10px 20px;
+  box-sizing: border-box;
+}
+
+.comment {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.commentBody {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+}
+
+.borderBottom {
+  padding-bottom: 12px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: "[theme:neutralLighter, default:#f4f4f4]"
+}
+
+
+@media screen and (max-width: 1280px) {
   .inputWrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 3px;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 10px 10px;
-    background-color: "[theme:white, default:#white]"
-  }
-
-  .mobileInputWrapper {
     display: none;
   }
 
-  .imageDescriptionWrapper {
-    padding: 20px 20px 5px 20px;
-  }
-
-  .commentList {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    overflow-y: auto;
-    gap: 18px;
-    padding: 10px 20px;
-    box-sizing: border-box;
-  }
-
-  .comment {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .commentBody {
-    display: flex;
-    flex-direction: column;
-    max-width: 80%;
-  }
-
-  .borderBottom {
-    padding-bottom: 8px;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: "[theme:neutralLighter, default:#f4f4f4]"
-  }
-
-
-  @media screen and (max-width: 1280px) {
-    .inputWrapper {
-      display: none;
-    }
-    
   .commentList {
     overflow-y: unset;
   }
@@ -79,4 +78,4 @@
     justify-content: center;
     padding: 1em;
   }
-  }
+}

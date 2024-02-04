@@ -34,10 +34,10 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
   }
 
   protected onInit(): Promise<void> {
+    configService.init(this.context.serviceScope, this.context.spHttpClient);
     imageService.init(this.context.serviceScope, this.context.spHttpClient);
     commentService.init(this.context.serviceScope, this.context.spHttpClient);
     userService.init(this.context.serviceScope, this.context.spHttpClient);
-    configService.init(this.context.serviceScope, this.context.spHttpClient);
     return this._getEnvironmentMessage().then((message) => {
       this._environmentMessage = message;
     });
