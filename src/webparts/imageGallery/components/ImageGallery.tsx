@@ -35,7 +35,7 @@ const ImageGallery = (): JSX.Element => {
   isAdmin;
 
   return (
-    <React.Fragment>
+    <div className={styles.appWrapper}>
       <GalleryHeader
         onSettingsButtonClick={toggleAdminPanel}
         onPivotClick={handlePivotClick}
@@ -53,7 +53,7 @@ const ImageGallery = (): JSX.Element => {
         />
         <AdminConfig isOpen={isAdminPanelOpen} onDismiss={toggleAdminPanel} />
       </div>
-    </React.Fragment>
+    </div>
   );
 
   async function handlePivotClick(selectedCategory: PivotItem): Promise<void> {
