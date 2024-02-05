@@ -14,6 +14,7 @@ import { commentService } from "../../../../services/commenService";
 import { userService } from "../../../../services/userService";
 import { CollapsibleInput } from "../CollapsibleInput/CollapsibleInput";
 import { CommentObj } from "../../../../models/CommentObj";
+import { TaggedUsers } from "../TaggedUsers/TaggedUsers";
 
 interface IComments {
   image: Post;
@@ -27,7 +28,7 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
   const isMobileLayout = windowSize.width < 1281;
 
   React.useEffect(() => {
-    (async () => await updateComments())();
+    (async () => await fetchComments())();
   }, []);
 
   return (
@@ -38,8 +39,8 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
           authorName={image.authorName}
           createdDate={image.createdDate}
           text={image.description}
-          separator
         />
+        {!!image.taggedUsers.length && <TaggedUsers users={image.taggedUsers} maxDisplayablePersonas={3} />}
       </section>
       <section style={{ flexGrow: 1, overflow: "auto" }}>
         <div className={styles.mobileInputWrapper}>
@@ -100,7 +101,7 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
     try {
       if (commentService.hasNext) {
         const nextPage = await commentService.getNext();
-        setComments(prev => ([...prev, ...nextPage]));
+        setComments((prev) => [...prev, ...nextPage]);
       }
     } catch (error) {
       console.error(error);
@@ -109,7 +110,7 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
 
   async function handleSubmit(): Promise<void> {
     if (commentText) {
-      commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
+      commentService.postComment(image.id, commentText).then(fetchComments).catch(console.error);
       closeInput();
       setCommentText("");
     }
@@ -117,13 +118,13 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
 
   async function handleKeyUp(e: React.KeyboardEvent): Promise<void> {
     if (e.key === "Enter" && commentText) {
-      commentService.postComment(image.id, commentText).then(updateComments).catch(console.error);
+      commentService.postComment(image.id, commentText).then(fetchComments).catch(console.error);
       closeInput();
       setCommentText("");
     }
   }
 
-  async function updateComments(): Promise<void> {
+  async function fetchComments(): Promise<void> {
     try {
       const res = await commentService.getComments(image.id);
       setComments(res);

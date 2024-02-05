@@ -10,7 +10,7 @@ const NO_METADATA = {
   Accept: "application/json;odata=nometadata",
 };
 
-const selectFields: (keyof IConfigServerObj)[] = ["Created", "DisableAllComments", "ID"];
+const selectFields: (keyof IConfigServerObj)[] = ["DisableAllComments", "ID"];
 
 export class ConfigService {
   public static readonly serviceKey: ServiceKey<ConfigService> = ServiceKey.create<ConfigService>(
@@ -24,7 +24,6 @@ export class ConfigService {
   public sitePath: string;
 
   public init(serviceScope: ServiceScope, spHttpClient: SPHttpClient): void {
-    // this._spHttpClient = spHttpClient;
     serviceScope.whenFinished(() => {
       this._pageContext = serviceScope.consume(PageContext.serviceKey);
       this.sitePath = this._pageContext.site.absoluteUrl;

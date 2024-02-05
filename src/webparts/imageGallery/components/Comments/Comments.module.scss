@@ -26,6 +26,13 @@
 
 .imageDescriptionWrapper {
   padding: 20px 20px 5px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding-bottom: 12px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: "[theme:neutralLighter, default:#f4f4f4]"
 }
 
 .commentList {

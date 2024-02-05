@@ -1,6 +1,7 @@
 import { CommentsRepository } from "./CommentsRepository";
 import { IPostServerObj } from "./IPostServerObj";
 import { ImageHelper } from "@microsoft/sp-image-helper";
+import { IListUser } from "./IListUser";
 
 const MAX_IMG_WIDTH = 800;
 const MAX_THUMBNAIL_WIDTH = 400;
@@ -19,6 +20,7 @@ export class Post {
   comments: CommentsRepository;
   imageWidth: number;
   imageHeight: number;
+  taggedUsers: Partial<IListUser>[];
 
   constructor(image?: IPostServerObj) {
     this.id = image?.ID || 0;
@@ -41,5 +43,6 @@ export class Post {
     this.comments = new CommentsRepository();
     this.imageWidth = image?.ImageWidth || 0;
     this.imageHeight = image?.ImageHeight || 0;
+    this.taggedUsers = image?.TaggedUsers || [];
   }
 }

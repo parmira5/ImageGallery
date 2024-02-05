@@ -1,5 +1,5 @@
 import { IFileInfo } from "@pnp/sp/files";
-import { IAuthorObj } from "./IAuthorObj";
+import { IListUser } from "./IListUser";
 
 export interface IPostServerObj {
   ID: number;
@@ -9,8 +9,9 @@ export interface IPostServerObj {
   DisableComments: boolean;
   ServerRelativePath: string;
   File: IFileInfo;
-  Author: IAuthorObj;
+  Author: IListUser;
   Created: string;
   ImageWidth: number;
-  ImageHeight: number
+  ImageHeight: number;
+  TaggedUsers: Partial<IListUser>[];
 }

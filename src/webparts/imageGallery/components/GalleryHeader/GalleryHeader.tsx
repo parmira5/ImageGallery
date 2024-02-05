@@ -5,6 +5,7 @@ import { mobileUsernameStyles, photoBtnStyles, pivotStyles } from "./fluentui.st
 import { ALL } from "../strings";
 import { controlPanelButtonStyles, usernameStyles } from "./fluentui.styles";
 import styles from "./GalleryHeader.module.scss";
+import Config from "../../../../models/Config";
 
 interface IProps {
   onClickFilterButton: (selectedKey: string) => void;
@@ -13,9 +14,19 @@ interface IProps {
   onPivotClick: (item?: PivotItem) => void;
   selectedCategory: string;
   showAdminControls: boolean;
+  config: Config;
 }
 
-export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick, onPivotClick, selectedCategory, showAdminControls, onClickFilterButton }: IProps): JSX.Element => {
+export const GalleryHeader = ({
+  onSettingsButtonClick,
+  onSubmitPhotoButtonClick,
+  onPivotClick,
+  selectedCategory,
+  showAdminControls,
+  onClickFilterButton,
+  config,
+}: IProps): JSX.Element => {
+  const { DisableTagging } = config;
   return (
     <div className={styles.galleryHeader}>
       <div className={styles.bannerPhoto}>
@@ -24,11 +35,13 @@ export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick,
           <Text styles={mobileUsernameStyles} variant="xLarge">
             {userService.currentUser().displayName}
           </Text>
-          {showAdminControls && <PrimaryButton
-            styles={{ root: { marginLeft: "auto", marginRight: 8, minWidth: 20 } }}
-            iconProps={{ iconName: "Settings" }}
-            onClick={onSettingsButtonClick}
-          />}
+          {showAdminControls && (
+            <PrimaryButton
+              styles={{ root: { marginLeft: "auto", marginRight: 8, minWidth: 20 } }}
+              iconProps={{ iconName: "Settings" }}
+              onClick={onSettingsButtonClick}
+            />
+          )}
         </div>
       </div>
       <div className={styles.controlPanel}>
@@ -36,10 +49,16 @@ export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick,
           {userService.currentUser().displayName}
         </Text>
         <div className={styles.postCount}>
-          <DefaultButton onClick={() => onClickFilterButton("MINE")} styles={controlPanelButtonStyles}>Posts: 32</DefaultButton>
+          <DefaultButton onClick={() => onClickFilterButton("MINE")} styles={controlPanelButtonStyles}>
+            Posts: 32
+          </DefaultButton>
         </div>
         <div className={styles.postCount}>
-          <DefaultButton onClick={() => onClickFilterButton("TAGGED")} styles={controlPanelButtonStyles}>Tagged: 12</DefaultButton>
+          {!DisableTagging && (
+            <DefaultButton onClick={() => onClickFilterButton("TAGGED")} styles={controlPanelButtonStyles}>
+              Tagged: 12
+            </DefaultButton>
+          )}
         </div>
         <PrimaryButton
           styles={photoBtnStyles}
@@ -48,9 +67,9 @@ export const GalleryHeader = ({ onSettingsButtonClick, onSubmitPhotoButtonClick,
         />
       </div>
       <Pivot styles={pivotStyles} overflowBehavior="menu" onLinkClick={onPivotClick} selectedKey={selectedCategory}>
-        <PivotItem key={ALL} itemKey={ALL} headerText={ALL} />
+        <PivotItem key={ALL} itemKey={ALL} headerText={"All"} />
         <PivotItem key={"MINE"} itemKey={"MINE"} headerText={"Mine"} />
-        <PivotItem key={"TAGGED"} itemKey={"TAGGED"} headerText={"Tagged"} />
+        {!DisableTagging ? <PivotItem key={"TAGGED"} itemKey={"TAGGED"} headerText={"Tagged"} /> : <></>}
       </Pivot>
     </div>
   );
