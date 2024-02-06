@@ -28,10 +28,8 @@
 .imageCard {
     position: relative;
     flex-grow: 1;
-    min-width: 33.2%;
-    max-width: 33.2%;
-    aspect-ratio: 1/1;
     overflow: hidden;
+    aspect-ratio: 1/1;
 
     &:hover {
         .imageOverlay {

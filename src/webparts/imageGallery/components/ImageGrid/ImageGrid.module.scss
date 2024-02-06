@@ -5,6 +5,15 @@
     flex-wrap: wrap;
   }
 
+  .imageCardWrapper {
+    min-width: 33.2%;
+    max-width: 33.2%;
+  }
+
+  .shimmerWrapper {
+    width: 100%;
+  }
+
 
   @media screen and (max-width: 1280px) {
     .imageGridWrapper {

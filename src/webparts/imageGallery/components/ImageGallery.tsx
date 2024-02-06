@@ -15,24 +15,64 @@ import { AdminConfig } from "./AdminConfig/AdminConfig";
 import { ImageViewer } from "./ImageViewer/ImageViewer";
 import { ImageGrid } from "./ImageGrid/ImageGrid";
 import { GalleryHeader } from "./GalleryHeader/GalleryHeader";
+import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
+import { DisplayMode } from "@microsoft/sp-core-library";
 
-const ImageGallery = (): JSX.Element => {
+interface IProps {
+  displayMode: DisplayMode;
+  layout: string;
+  carouselHeader: string;
+  onChangeCarouselHeader: (
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ) => void;
+}
+
+const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
   const [selectedCategory, setSelectedCategory] = React.useState<string>(ALL);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isAdminVisible, { toggle: toggleAdminVisible }] = useBoolean(false);
   const [isImageViewerVisible, { toggle: toggleImageViewerVisible }] = useBoolean(false);
+  const [isGridLoading, { setTrue: gridLoading, setFalse: gridDoneLoading }] = useBoolean(false);
 
   const [config, updateConfig] = useConfig();
 
   React.useEffect(() => {
     (async () => {
+      gridLoading();
       const _posts = await imageService.getAllPosts(config.DisableAllComments);
       setPosts(_posts);
+      gridDoneLoading();
       userService.currentUserHasFullControlOnImageList().then(setIsAdmin).catch(console.error);
     })();
   }, [config]);
+
+  if (layout === "carousel")
+    return (
+      <>
+        <ImageCarousel
+          posts={posts}
+          onClickItem={handleClickImage}
+          headerText={carouselHeader}
+          onChangeHeader={onChangeCarouselHeader}
+          displayMode={displayMode}
+        />
+        <ImageViewer
+          isOpen={isImageViewerVisible}
+          onDismiss={toggleImageViewerVisible}
+          selectedPost={selectedPost}
+          hideComments={!!config?.DisableAllComments}
+        />
+        <AdminConfig
+          isOpen={isAdminVisible}
+          onDismiss={toggleAdminVisible}
+          config={config}
+          updateConfig={updateConfig}
+        />
+      </>
+    );
 
   return (
     <div className={styles.appWrapper}>
@@ -54,6 +94,7 @@ const ImageGallery = (): JSX.Element => {
           onClickItem={handleClickImage}
           onClickMore={handleLoadMore}
           hasNext={imageService.hasNext}
+          isLoading={isGridLoading}
         />
       </div>
       <ImageViewer
@@ -67,39 +108,17 @@ const ImageGallery = (): JSX.Element => {
   );
 
   async function handlePivotClick(selectedCategory: PivotItem): Promise<void> {
-    let _posts: Post[];
-    if (selectedCategory.props.itemKey) setSelectedCategory(selectedCategory.props.itemKey);
-    switch (selectedCategory.props.itemKey) {
-      case "MINE":
-        _posts = await imageService.getAllUsersPosts();
-        break;
-      case "TAGGED":
-        _posts = await imageService.getAllUsersTaggedPosts();
-        break;
-      case "ALL":
-      default:
-        _posts = await imageService.getAllPosts();
-        break;
+    if (selectedCategory.props.itemKey) {
+      gridLoading();
+      await handleVerticalChange(selectedCategory.props.itemKey);
+      gridDoneLoading();
     }
-    setPosts(_posts);
   }
 
   async function handleClickFilterButton(selectedKey: string): Promise<void> {
-    let _posts: Post[];
-    if (selectedKey) setSelectedCategory(selectedKey);
-    switch (selectedKey) {
-      case "MINE":
-        _posts = await imageService.getAllUsersPosts();
-        break;
-      case "TAGGED":
-        _posts = await imageService.getAllUsersTaggedPosts();
-        break;
-      case "ALL":
-      default:
-        _posts = await imageService.getAllPosts();
-        break;
-    }
-    setPosts(_posts);
+    gridLoading();
+    await handleVerticalChange(selectedKey);
+    gridDoneLoading();
   }
 
   function handleClickImage(post: Post): void {
@@ -114,6 +133,24 @@ const ImageGallery = (): JSX.Element => {
         setPosts((prev) => [...prev, ...nextSet]);
       }
     }
+  }
+
+  async function handleVerticalChange(vert: string) {
+    let _posts: Post[];
+    if (vert) setSelectedCategory(vert);
+    switch (vert) {
+      case "MINE":
+        _posts = await imageService.getAllUsersPosts();
+        break;
+      case "TAGGED":
+        _posts = await imageService.getAllUsersTaggedPosts();
+        break;
+      case "ALL":
+      default:
+        _posts = await imageService.getAllPosts();
+        break;
+    }
+    setPosts(_posts);
   }
 };
 

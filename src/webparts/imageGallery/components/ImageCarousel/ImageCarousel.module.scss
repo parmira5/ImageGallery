@@ -1,0 +1,28 @@
+.imageCarousel {
+    width: 100%;
+    height: auto;
+    overflow-x: scroll;
+    display: flex;
+    flex-direction: row;
+    gap:1px;
+    box-sizing: border-box;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.imageCardWrapper {
+    min-width: 22%;
+    max-width: 22%;
+    height: auto;
+
+    @media screen and (max-width: 1280px) {
+        min-width: 30%;
+        max-width: 30%;
+    }
+
+    @media screen and (max-width: 480px) {
+        min-width: 48%;
+        max-width: 48%;
+    }
+}

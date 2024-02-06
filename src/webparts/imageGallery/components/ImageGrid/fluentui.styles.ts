@@ -1,4 +1,4 @@
-import { IButtonStyles, IPanelStyles, IPivotStyles } from "@fluentui/react";
+import { IButtonStyles, IPanelStyles, IPivotStyles, IShimmerStyles } from "@fluentui/react";
 
 export const pivotStyles: Partial<IPivotStyles> = {
   root: {
@@ -31,3 +31,8 @@ export const panelStyles: Partial<IPanelStyles> = {
 };
 
 export const pageBtnStyles: Partial<IButtonStyles> = { root: { alignSelf: "center" } };
+
+export const shimmerStyles: Partial<IShimmerStyles> = {
+  root: { minWidth: "33.2%", maxWidth: "33.2%", aspectRatio: "1/1" },
+  shimmerWrapper: { height: "100%" },
+};

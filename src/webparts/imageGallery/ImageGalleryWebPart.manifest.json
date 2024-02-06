@@ -15,14 +15,17 @@
   "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
   "supportsThemeVariants": true,
 
-  "preconfiguredEntries": [{
-    "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Advanced
-    "group": { "default": "Advanced" },
-    "title": { "default": "image-gallery" },
-    "description": { "default": "image-gallery description" },
-    "officeFabricIconFontName": "Page",
-    "properties": {
-      "description": "image-gallery"
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Advanced
+      "group": { "default": "Advanced" },
+      "title": { "default": "image-gallery" },
+      "description": { "default": "image-gallery description" },
+      "officeFabricIconFontName": "Page",
+      "properties": {
+        "description": "image-gallery",
+        "carouselHeader": ""
+      }
     }
-  }]
+  ]
 }
