@@ -16,11 +16,11 @@ export const AdminConfig = ({ config, updateConfig, ...props }: IProps): JSX.Ele
     </Panel>
   );
 
-  function handleCommentsToggle(event: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean) {
+  function handleCommentsToggle(event: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean): void {
     updateConfig({ ...config, DisableAllComments: !!checked }).catch();
   }
 
-  function handleTaggingToggle(event: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean) {
+  function handleTaggingToggle(event: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean): void {
     updateConfig({ ...config, DisableTagging: !!checked }).catch();
   }
 };

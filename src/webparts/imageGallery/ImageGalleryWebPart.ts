@@ -13,8 +13,14 @@ import { configService } from "../../services/configService";
 import { commentService } from "../../services/commenService";
 import { IReadonlyTheme } from "@microsoft/sp-component-base";
 
+export enum AppType {
+  FullPageApp = 1,
+  Grid = 2,
+  Carousel = 3,
+}
+
 export interface IImageGalleryWebPartProps {
-  layout: string;
+  layout: AppType;
   carouselHeader: string;
 }
 
@@ -25,7 +31,6 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
       layout: this.properties.layout,
       onChangeCarouselHeader: this._handleChangeCarouselHeader.bind(this),
       displayMode: this.displayMode,
-      isSPA: !this.context.widthCacheKey
     });
     ReactDom.render(element, this.domElement);
   }
@@ -47,7 +52,7 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
   }
 
   protected onThemeChanged(theme: IReadonlyTheme | undefined): void {
-    this.render()
+    this.render();
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -63,8 +68,9 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
               groupFields: [
                 PropertyPaneChoiceGroup("layout", {
                   options: [
-                    { key: "grid", text: "Grid" },
-                    { key: "carousel", text: "Carousel" },
+                    { key: AppType.FullPageApp, text: "Full Page (Requires full width or SPA page)" },
+                    { key: AppType.Grid, text: "Grid" },
+                    { key: AppType.Carousel, text: "Carousel" },
                   ],
                 }),
               ],
@@ -78,8 +84,8 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
   private _handleChangeCarouselHeader(
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
-  ) {
+  ): void {
     this.properties.carouselHeader = newValue || "";
-    this.render()
+    this.render();
   }
 }

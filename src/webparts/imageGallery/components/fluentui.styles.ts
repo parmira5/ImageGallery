@@ -1,4 +1,4 @@
-import { IPanelStyles } from "@fluentui/react";
+import { IPanelStyles, IPivotStyles } from "@fluentui/react";
 
 export const panelStyles: Partial<IPanelStyles> = {
   main: { backgroundColor: "rgba(0,0,0,0.85)" },
@@ -18,5 +18,18 @@ export const panelStyles: Partial<IPanelStyles> = {
         paddingRight: 0,
       },
     },
+  },
+};
+
+export const pivotStyles: Partial<IPivotStyles> = {
+  root: {
+    position: "relative",
+    left: "-8px",
+    width: "100%",
+    maxWidth: 980,
+    margin: "auto",
+    marginBottom: "1.5em",
+    "@media screen and (max-width: 1280px)": { paddingLeft: "14px" },
+    "@media screen and (max-width: 480px)": { display: "flex", width: "100%", justifyContent: "center" },
   },
 };

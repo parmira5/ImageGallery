@@ -21,7 +21,7 @@ export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading 
   return (
     <section className={styles.imageGridWrapper}>
       {posts.map((post) => (
-        <div className={styles.imageCardWrapper}>
+        <div key={post.id} className={styles.imageCardWrapper}>
           <ImageCard key={post.id} onClick={onClickItem} id={post.id} post={post}>
             <ImageOverlay
               id={post.id}
@@ -40,7 +40,7 @@ export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading 
   );
 };
 
-function ImageGridShimmer() {
+function ImageGridShimmer(): JSX.Element {
   return (
     <div className={`${styles.imageGridWrapper} ${styles.shimmerWrapper}`}>
       <Shimmer styles={shimmerStyles} />
@@ -55,7 +55,3 @@ function ImageGridShimmer() {
     </div>
   );
 }
-
-// // {[1, 2, 3, 4, 5, 6].map(() => {
-// <Shimmer styles={shimmerStyles} />
-// // })}

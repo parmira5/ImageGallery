@@ -29,7 +29,7 @@ export const CollapsibleInput = ({
   expandButtonProps,
   saveButtonProps,
   placeHolder,
-}: IProps) => {
+}: IProps): JSX.Element => {
   if (!isOpen) {
     return (
       <React.Fragment>
@@ -40,7 +40,15 @@ export const CollapsibleInput = ({
 
   return (
     <div className={styles.collapsibleInput}>
-      <TextField styles={inputStyles} placeholder={placeHolder} multiline value={value} onChange={onChangeInput} borderless resizable={false} />
+      <TextField
+        styles={inputStyles}
+        placeholder={placeHolder}
+        multiline
+        value={value}
+        onChange={onChangeInput}
+        borderless
+        resizable={false}
+      />
       <div className={styles.buttonWrapper}>
         <DefaultButton {...cancelButtonProps} text="Cancel" onClick={onCancel} />
         <PrimaryButton {...saveButtonProps} text="Send" onClick={onSave} />

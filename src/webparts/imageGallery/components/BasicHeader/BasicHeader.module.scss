@@ -1,0 +1,12 @@
+.basicHeader {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+}
+
+.topRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: .5em;
+}

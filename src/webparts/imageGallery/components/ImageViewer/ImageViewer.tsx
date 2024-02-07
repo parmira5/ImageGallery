@@ -8,9 +8,15 @@ import styles from "./ImageViewer.module.scss";
 interface IProps extends Pick<IPanelProps, "onDismiss" | "isOpen"> {
   selectedPost: Post;
   hideComments: boolean;
+  hideTags: boolean;
 }
 
-export const ImageViewer = ({ selectedPost, hideComments, ...props }: React.PropsWithChildren<IProps>): JSX.Element => {
+export const ImageViewer = ({
+  selectedPost,
+  hideComments,
+  hideTags,
+  ...props
+}: React.PropsWithChildren<IProps>): JSX.Element => {
   const postWrapperRef = React.useRef<HTMLElement>(null);
   return (
     <Panel {...props} styles={panelStyles} type={PanelType.custom} customWidth="100%" allowTouchBodyScroll>
@@ -24,7 +30,7 @@ export const ImageViewer = ({ selectedPost, hideComments, ...props }: React.Prop
         />
         {!hideComments && (
           <div className={styles.commentsWrapper}>
-            <Comments ref={postWrapperRef} image={selectedPost} />
+            <Comments ref={postWrapperRef} image={selectedPost} hideTags={hideTags} />
           </div>
         )}
       </section>

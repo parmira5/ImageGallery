@@ -1,8 +1,7 @@
-import { Text, Pivot, PivotItem, DefaultButton, PrimaryButton } from "@fluentui/react";
+import { Text, DefaultButton, PrimaryButton } from "@fluentui/react";
 import * as React from "react";
 import { userService } from "../../../../services/userService";
-import { mobileUsernameStyles, photoBtnStyles, pivotStyles } from "./fluentui.styles";
-import { ALL } from "../strings";
+import { mobileUsernameStyles, photoBtnStyles } from "./fluentui.styles";
 import { controlPanelButtonStyles, usernameStyles } from "./fluentui.styles";
 import styles from "./GalleryHeader.module.scss";
 import Config from "../../../../models/Config";
@@ -11,7 +10,6 @@ interface IProps {
   onClickFilterButton: (selectedKey: string) => void;
   onSettingsButtonClick: () => void;
   onSubmitPhotoButtonClick: () => void;
-  onPivotClick: (item?: PivotItem) => void;
   selectedCategory: string;
   showAdminControls: boolean;
   config: Config;
@@ -20,8 +18,6 @@ interface IProps {
 export const GalleryHeader = ({
   onSettingsButtonClick,
   onSubmitPhotoButtonClick,
-  onPivotClick,
-  selectedCategory,
   showAdminControls,
   onClickFilterButton,
   config,
@@ -66,11 +62,6 @@ export const GalleryHeader = ({
           onClick={onSubmitPhotoButtonClick}
         />
       </div>
-      <Pivot styles={pivotStyles} overflowBehavior="menu" onLinkClick={onPivotClick} selectedKey={selectedCategory}>
-        <PivotItem key={ALL} itemKey={ALL} headerText={"All"} />
-        <PivotItem key={"MINE"} itemKey={"MINE"} headerText={"Mine"} />
-        {!DisableTagging ? <PivotItem key={"TAGGED"} itemKey={"TAGGED"} headerText={"Tagged"} /> : <></>}
-      </Pivot>
     </div>
   );
 };

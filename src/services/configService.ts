@@ -10,7 +10,7 @@ const NO_METADATA = {
   Accept: "application/json;odata=nometadata",
 };
 
-const selectFields: (keyof IConfigServerObj)[] = ["DisableAllComments", "ID"];
+const selectFields: (keyof IConfigServerObj)[] = ["DisableAllComments", "ID", "DisableTagging"];
 
 export class ConfigService {
   public static readonly serviceKey: ServiceKey<ConfigService> = ServiceKey.create<ConfigService>(
