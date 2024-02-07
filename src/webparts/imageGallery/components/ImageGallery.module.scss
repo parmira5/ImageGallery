@@ -1,7 +1,11 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
-.appWrapper {
+.spaAppWrapper {
   width: 100vw;
+}
+
+.webpartAppWrapper {
+  width: 100%;
 }
 
 .menuWrapper {

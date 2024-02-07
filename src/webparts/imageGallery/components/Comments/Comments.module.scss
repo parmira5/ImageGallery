@@ -35,6 +35,15 @@
   border-bottom-color: "[theme:neutralLighter, default:#f4f4f4]"
 }
 
+.commentsListWrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .commentList {
   display: flex;
   flex-direction: column;
@@ -43,6 +52,10 @@
   gap: 18px;
   padding: 10px 20px;
   box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .comment {

@@ -33,7 +33,7 @@ export class CommentService {
     private _spHttpClient: SPHttpClient;
     private _pageContext: PageContext;
     private _baseQuery: string;
-    private _odataAddOns = "?$inlineCount=AllPages&%24top=15"
+    private _odataAddOns = "?$inlineCount=AllPages&%24top=21"
     private _nextLink: string;
     public hasNext = false;
 

@@ -11,6 +11,7 @@ import { imageService } from "../../services/imageService";
 import { userService } from "../../services/userService";
 import { configService } from "../../services/configService";
 import { commentService } from "../../services/commenService";
+import { IReadonlyTheme } from "@microsoft/sp-component-base";
 
 export interface IImageGalleryWebPartProps {
   layout: string;
@@ -18,14 +19,14 @@ export interface IImageGalleryWebPartProps {
 }
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
-  public render(): void {
+  public async render(): Promise<void> {
     const element: React.ReactElement<IImageGalleryProps> = React.createElement(ImageGallery, {
       carouselHeader: this.properties.carouselHeader,
       layout: this.properties.layout,
       onChangeCarouselHeader: this._handleChangeCarouselHeader.bind(this),
       displayMode: this.displayMode,
+      isSPA: !this.context.widthCacheKey
     });
-
     ReactDom.render(element, this.domElement);
   }
 
@@ -43,6 +44,10 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
 
   protected get dataVersion(): Version {
     return Version.parse("1.0");
+  }
+
+  protected onThemeChanged(theme: IReadonlyTheme | undefined): void {
+    this.render()
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -75,5 +80,6 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
     newValue?: string | undefined
   ) {
     this.properties.carouselHeader = newValue || "";
+    this.render()
   }
 }

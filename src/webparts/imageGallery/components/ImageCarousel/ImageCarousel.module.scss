@@ -1,11 +1,17 @@
-.imageCarousel {
+.imageCarouselWrapper {
     width: 100%;
+    max-width: 1280px;
+    margin: auto;
+}
+
+.imageCarousel {
     height: auto;
     overflow-x: scroll;
     display: flex;
     flex-direction: row;
-    gap:1px;
+    gap: 1px;
     box-sizing: border-box;
+
     &::-webkit-scrollbar {
         display: none;
     }
@@ -25,4 +31,11 @@
         min-width: 48%;
         max-width: 48%;
     }
+}
+
+.topRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: .5em;
 }

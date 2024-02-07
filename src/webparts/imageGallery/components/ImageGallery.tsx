@@ -22,13 +22,14 @@ interface IProps {
   displayMode: DisplayMode;
   layout: string;
   carouselHeader: string;
+  isSPA: boolean;
   onChangeCarouselHeader: (
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
   ) => void;
 }
 
-const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
+const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayMode, isSPA }: IProps): JSX.Element => {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
   const [selectedCategory, setSelectedCategory] = React.useState<string>(ALL);
@@ -38,9 +39,11 @@ const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayM
   const [isGridLoading, { setTrue: gridLoading, setFalse: gridDoneLoading }] = useBoolean(false);
 
   const [config, updateConfig] = useConfig();
+  const isCarousel = layout === "carousel";
 
   React.useEffect(() => {
     (async () => {
+      setSelectedCategory(ALL)
       gridLoading();
       const _posts = await imageService.getAllPosts(config.DisableAllComments);
       setPosts(_posts);
@@ -49,54 +52,41 @@ const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayM
     })();
   }, [config]);
 
-  if (layout === "carousel")
-    return (
-      <>
-        <ImageCarousel
-          posts={posts}
-          onClickItem={handleClickImage}
-          headerText={carouselHeader}
-          onChangeHeader={onChangeCarouselHeader}
-          displayMode={displayMode}
-        />
-        <ImageViewer
-          isOpen={isImageViewerVisible}
-          onDismiss={toggleImageViewerVisible}
-          selectedPost={selectedPost}
-          hideComments={!!config?.DisableAllComments}
-        />
-        <AdminConfig
-          isOpen={isAdminVisible}
-          onDismiss={toggleAdminVisible}
-          config={config}
-          updateConfig={updateConfig}
-        />
-      </>
-    );
+  const gridClass = !isSPA || displayMode === DisplayMode.Edit ? styles.webpartAppWrapper : styles.spaAppWrapper;
 
   return (
-    <div className={styles.appWrapper}>
-      <GalleryHeader
-        config={config}
-        onClickFilterButton={handleClickFilterButton}
-        showAdminControls={isAdmin}
-        selectedCategory={selectedCategory}
-        onSettingsButtonClick={toggleAdminVisible}
-        onPivotClick={handlePivotClick}
-        onSubmitPhotoButtonClick={() => {
-          window.location.href =
-            "https://r3v365.sharepoint.com/sites/NEWSSITE2/_layouts/15/upload.aspx?List=%7B004FE25A-52A8-46AD-8623-D39472E55A66%7D&RootFolder=%2Fsites%2FNEWSSITE2%2FImage%20Gallery&ContentTypeId=0x01010200908E517D0A2D0B40B5F9566F4030C6DC00F207EA97E9128F48B8EE3D7585B53555&Source=https://r3v365.sharepoint.com/sites/NEWSSITE2";
-        }}
-      />
-      <div className={styles.imageGallery}>
-        <ImageGrid
-          posts={posts}
-          onClickItem={handleClickImage}
-          onClickMore={handleLoadMore}
-          hasNext={imageService.hasNext}
-          isLoading={isGridLoading}
+    <React.Fragment>
+      {isCarousel && <ImageCarousel
+        posts={posts}
+        onClickItem={handleClickImage}
+        headerText={carouselHeader}
+        onChangeHeader={onChangeCarouselHeader}
+        displayMode={displayMode}
+        onClickSettings={toggleAdminVisible}
+      />}
+      {!isCarousel && <div className={gridClass}>
+        <GalleryHeader
+          config={config}
+          onClickFilterButton={handleClickFilterButton}
+          showAdminControls={isAdmin}
+          selectedCategory={selectedCategory}
+          onSettingsButtonClick={toggleAdminVisible}
+          onPivotClick={handlePivotClick}
+          onSubmitPhotoButtonClick={() => {
+            window.location.href =
+              "https://r3v365.sharepoint.com/sites/NEWSSITE2/_layouts/15/upload.aspx?List=%7B004FE25A-52A8-46AD-8623-D39472E55A66%7D&RootFolder=%2Fsites%2FNEWSSITE2%2FImage%20Gallery&ContentTypeId=0x01010200908E517D0A2D0B40B5F9566F4030C6DC00F207EA97E9128F48B8EE3D7585B53555&Source=https://r3v365.sharepoint.com/sites/NEWSSITE2";
+          }}
         />
-      </div>
+        <div className={styles.imageGallery}>
+          <ImageGrid
+            posts={posts}
+            onClickItem={handleClickImage}
+            onClickMore={handleLoadMore}
+            hasNext={imageService.hasNext}
+            isLoading={isGridLoading}
+          />
+        </div>
+      </div>}
       <ImageViewer
         isOpen={isImageViewerVisible}
         onDismiss={toggleImageViewerVisible}
@@ -104,7 +94,7 @@ const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayM
         hideComments={!!config?.DisableAllComments}
       />
       <AdminConfig isOpen={isAdminVisible} onDismiss={toggleAdminVisible} config={config} updateConfig={updateConfig} />
-    </div>
+    </React.Fragment>
   );
 
   async function handlePivotClick(selectedCategory: PivotItem): Promise<void> {

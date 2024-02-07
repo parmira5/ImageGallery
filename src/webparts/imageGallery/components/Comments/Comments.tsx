@@ -42,7 +42,7 @@ export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefOb
         />
         {!!image.taggedUsers.length && <TaggedUsers users={image.taggedUsers} maxDisplayablePersonas={3} />}
       </section>
-      <section style={{ flexGrow: 1, overflow: "auto" }}>
+      <section className={styles.commentsListWrapper}>
         <div className={styles.mobileInputWrapper}>
           <CollapsibleInput
             isOpen={isInputOpen}
