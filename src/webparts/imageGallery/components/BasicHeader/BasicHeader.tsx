@@ -3,7 +3,7 @@ import * as React from "react";
 import styles from "./BasicHeader.module.scss";
 import { DisplayMode } from "@microsoft/sp-core-library";
 
-interface IProps {
+export interface IProps {
   onClickSettings: () => void;
   onChangeHeader: (
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,

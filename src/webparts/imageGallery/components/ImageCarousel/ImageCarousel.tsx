@@ -4,7 +4,7 @@ import ImageCard from "../ImageCard/ImageCard";
 import { ImageOverlay } from "../ImageCard/ImageOverlay";
 import styles from "./ImageCarousel.module.scss";
 import { useDraggable } from "react-use-draggable-scroll";
-interface IProps {
+export interface IProps {
   posts: Post[];
   onClickItem: (post: Post) => void;
 }

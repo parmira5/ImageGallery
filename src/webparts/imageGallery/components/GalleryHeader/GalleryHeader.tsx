@@ -6,7 +6,7 @@ import { controlPanelButtonStyles, usernameStyles } from "./fluentui.styles";
 import styles from "./GalleryHeader.module.scss";
 import Config from "../../../../models/Config";
 
-interface IProps {
+export interface IProps {
   onClickFilterButton: (selectedKey: string) => void;
   onSettingsButtonClick: () => void;
   onSubmitPhotoButtonClick: () => void;

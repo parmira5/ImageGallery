@@ -8,7 +8,7 @@ import { pageBtnStyles, shimmerStyles } from "./fluentui.styles";
 import styles from "./ImageGrid.module.scss";
 import { LOAD_MORE } from "./strings";
 
-interface IProps {
+export interface IProps {
   posts: Post[];
   hasNext: boolean;
   onClickItem: (post: Post) => void;

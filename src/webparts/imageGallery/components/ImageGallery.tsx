@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Pivot, PivotItem } from "@fluentui/react";
-import styles from "./ImageGallery.module.scss";
+import { PivotItem } from "@fluentui/react";
 
 import { ALL } from "./strings";
 import { Post } from "../../../models/Post";
@@ -13,14 +12,12 @@ import { useBoolean } from "@fluentui/react-hooks";
 
 import { AdminConfig } from "./AdminConfig/AdminConfig";
 import { ImageViewer } from "./ImageViewer/ImageViewer";
-import { ImageGrid } from "./ImageGrid/ImageGrid";
-import { GalleryHeader } from "./GalleryHeader/GalleryHeader";
-import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
 import { DisplayMode } from "@microsoft/sp-core-library";
-import { pivotStyles } from "./fluentui.styles";
-import { BasicHeader } from "./BasicHeader/BasicHeader";
 import { ConfigContext } from "../../../context/ConfigContext";
 import { AppType } from "../../../models/AppType";
+import { FullPageApp } from "./FullPageApp";
+import { CarouselApp } from "./CarouselApp";
+import { GridApp } from "./GridApp";
 
 interface IProps {
   displayMode: DisplayMode;
@@ -42,9 +39,8 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
   const { carouselHeader, layout } = React.useContext(ConfigContext);
 
   const [config, updateConfig] = useConfig();
-  const isCarousel = layout === AppType.Carousel;
-  const isSPA = layout === AppType.FullPageApp;
-  const isGrid = layout === AppType.Grid;
+
+  console.log(isAdmin);
 
   React.useEffect(() => {
     (async () => {
@@ -57,62 +53,61 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
     })();
   }, [config]);
 
-  const gridClass = !isSPA ? styles.webpartAppWrapper : styles.spaAppWrapper;
+  let app: JSX.Element;
 
-  const galleryHeader = isSPA && (
-    <GalleryHeader
-      config={config}
-      onClickFilterButton={handleClickFilterButton}
-      showAdminControls={isAdmin}
-      selectedCategory={selectedCategory}
-      onSettingsButtonClick={toggleAdminVisible}
-      onSubmitPhotoButtonClick={() => {
-        window.location.href =
-          "https://r3v365.sharepoint.com/sites/NEWSSITE2/_layouts/15/upload.aspx?List=%7B004FE25A-52A8-46AD-8623-D39472E55A66%7D&RootFolder=%2Fsites%2FNEWSSITE2%2FImage%20Gallery&ContentTypeId=0x01010200908E517D0A2D0B40B5F9566F4030C6DC00F207EA97E9128F48B8EE3D7585B53555&Source=https://r3v365.sharepoint.com/sites/NEWSSITE2";
-      }}
-    />
-  );
-
-  const basicHeader = (isGrid || isCarousel) && (
-    <BasicHeader
-      headerText={carouselHeader}
-      onChangeHeader={onChangeCarouselHeader}
-      displayMode={displayMode}
-      onClickSettings={toggleAdminVisible}
-    />
-  );
-
-  const galleryBody = isCarousel ? (
-    <ImageCarousel posts={posts} onClickItem={handleClickImage} />
-  ) : (
-    <div className={styles.imageGallery}>
-      <ImageGrid
-        posts={posts}
-        onClickItem={handleClickImage}
-        onClickMore={handleLoadMore}
-        hasNext={imageService.hasNext}
-        isLoading={isGridLoading}
-      />
-    </div>
-  );
+  switch (layout) {
+    case AppType.Grid:
+      app = (
+        <GridApp
+          displayMode={displayMode}
+          hasNext={imageService.hasNext}
+          headerText={carouselHeader}
+          isLoading={isGridLoading}
+          onChangeHeader={onChangeCarouselHeader}
+          onClickItem={handleClickImage}
+          onClickMore={handleLoadMore}
+          onClickSettings={toggleAdminVisible}
+          posts={posts}
+        />
+      );
+      break;
+    case AppType.Carousel:
+      app = (
+        <CarouselApp
+          displayMode={displayMode}
+          headerText={carouselHeader}
+          onChangeHeader={onChangeCarouselHeader}
+          onClickItem={handleClickImage}
+          onClickSettings={toggleAdminVisible}
+          posts={posts}
+        />
+      );
+      break;
+    case AppType.FullPageApp:
+    default:
+      app = (
+        <FullPageApp
+          config={config}
+          hasNext={imageService.hasNext}
+          isLoading={isGridLoading}
+          onClickFilterButton={handleClickFilterButton}
+          onClickItem={handleClickImage}
+          onClickMore={handleLoadMore}
+          onSettingsButtonClick={toggleAdminVisible}
+          onSubmitPhotoButtonClick={() => console.log("")}
+          posts={posts}
+          selectedCategory={selectedCategory}
+          showAdminControls={isAdminVisible}
+          toggleAdminPanelVisible={toggleAdminVisible}
+          onPivotClick={handlePivotClick}
+        />
+      );
+      break;
+  }
 
   return (
-    <React.Fragment>
-      <div className={gridClass}>
-        {basicHeader}
-        {galleryHeader}
-        <Pivot
-          styles={pivotStyles}
-          overflowBehavior="menu"
-          onLinkClick={handlePivotClick}
-          selectedKey={selectedCategory}
-        >
-          <PivotItem key={ALL} itemKey={ALL} headerText={"All"} />
-          <PivotItem key={"MINE"} itemKey={"MINE"} headerText={"Mine"} />
-          {!config.DisableTagging ? <PivotItem key={"TAGGED"} itemKey={"TAGGED"} headerText={"Tagged"} /> : <></>}
-        </Pivot>
-        {galleryBody}
-      </div>
+    <>
+      {app}
       <ImageViewer
         isOpen={isImageViewerVisible}
         onDismiss={toggleImageViewerVisible}
@@ -121,7 +116,7 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
         hideTags={!!config?.DisableTagging}
       />
       <AdminConfig isOpen={isAdminVisible} onDismiss={toggleAdminVisible} config={config} updateConfig={updateConfig} />
-    </React.Fragment>
+    </>
   );
 
   async function handlePivotClick(selectedCategory: PivotItem): Promise<void> {
