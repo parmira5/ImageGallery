@@ -18,20 +18,19 @@ import { GalleryHeader } from "./GalleryHeader/GalleryHeader";
 import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
 import { DisplayMode } from "@microsoft/sp-core-library";
 import { pivotStyles } from "./fluentui.styles";
-import { AppType } from "../ImageGalleryWebPart";
 import { BasicHeader } from "./BasicHeader/BasicHeader";
+import { ConfigContext } from "../../../context/ConfigContext";
+import { AppType } from "../../../models/AppType";
 
 interface IProps {
   displayMode: DisplayMode;
-  layout: AppType;
-  carouselHeader: string;
   onChangeCarouselHeader: (
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
   ) => void;
 }
 
-const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
+const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
   const [selectedCategory, setSelectedCategory] = React.useState<string>(ALL);
@@ -40,12 +39,12 @@ const ImageGallery = ({ layout, carouselHeader, onChangeCarouselHeader, displayM
   const [isImageViewerVisible, { toggle: toggleImageViewerVisible }] = useBoolean(false);
   const [isGridLoading, { setTrue: gridLoading, setFalse: gridDoneLoading }] = useBoolean(false);
 
+  const { carouselHeader, layout } = React.useContext(ConfigContext);
+
   const [config, updateConfig] = useConfig();
   const isCarousel = layout === AppType.Carousel;
   const isSPA = layout === AppType.FullPageApp;
   const isGrid = layout === AppType.Grid;
-
-  console.log(isGrid);
 
   React.useEffect(() => {
     (async () => {

@@ -12,12 +12,8 @@ import { userService } from "../../services/userService";
 import { configService } from "../../services/configService";
 import { commentService } from "../../services/commenService";
 import { IReadonlyTheme } from "@microsoft/sp-component-base";
-
-export enum AppType {
-  FullPageApp = 1,
-  Grid = 2,
-  Carousel = 3,
-}
+import { ConfigContext } from "../../context/ConfigContext";
+import { AppType } from "../../models/AppType";
 
 export interface IImageGalleryWebPartProps {
   layout: AppType;
@@ -26,12 +22,14 @@ export interface IImageGalleryWebPartProps {
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
   public async render(): Promise<void> {
-    const element: React.ReactElement<IImageGalleryProps> = React.createElement(ImageGallery, {
-      carouselHeader: this.properties.carouselHeader,
-      layout: this.properties.layout,
-      onChangeCarouselHeader: this._handleChangeCarouselHeader.bind(this),
-      displayMode: this.displayMode,
-    });
+    const element: React.ReactElement<IImageGalleryProps> = (
+      <ConfigContext.Provider value={this.properties}>
+        <ImageGallery
+          onChangeCarouselHeader={this._handleChangeCarouselHeader.bind(this)}
+          displayMode={this.displayMode}
+        />
+      </ConfigContext.Provider>
+    );
     ReactDom.render(element, this.domElement);
   }
 
