@@ -7,6 +7,8 @@ import { pageBtnIcon } from "./fluentui.props";
 import { pageBtnStyles, shimmerStyles } from "./fluentui.styles";
 import styles from "./ImageGrid.module.scss";
 import { LOAD_MORE } from "./strings";
+import { ConfigContext } from "../../../../context/ConfigContext";
+import { ColumnCount } from "../../../../models/ColumnCount";
 
 export interface IProps {
   posts: Post[];
@@ -16,12 +18,24 @@ export interface IProps {
   isLoading: boolean;
 }
 
+const columnCountDict = {
+  [ColumnCount.Two]: "49.8%",
+  [ColumnCount.Three]: "33.1%",
+  [ColumnCount.Four]: "24.7%",
+  [ColumnCount.Five]: "19.6%",
+};
+
 export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading }: IProps): JSX.Element => {
+  const { columnCount, showPaginationControl } = React.useContext(ConfigContext);
   if (isLoading) return <ImageGridShimmer />;
   return (
     <section className={styles.imageGridWrapper}>
       {posts.map((post) => (
-        <div key={post.id} className={styles.imageCardWrapper}>
+        <div
+          key={post.id}
+          className={styles.imageCardWrapper}
+          style={{ minWidth: columnCountDict[columnCount], maxWidth: columnCountDict[columnCount] }}
+        >
           <ImageCard key={post.id} onClick={onClickItem} id={post.id} post={post}>
             <ImageOverlay
               id={post.id}
@@ -33,7 +47,7 @@ export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading 
           </ImageCard>
         </div>
       ))}
-      {hasNext && (
+      {hasNext && showPaginationControl && (
         <ActionButton styles={pageBtnStyles} iconProps={pageBtnIcon} text={LOAD_MORE} onClick={onClickMore} />
       )}
     </section>
@@ -41,17 +55,18 @@ export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading 
 };
 
 function ImageGridShimmer(): JSX.Element {
+  const { columnCount, pageSize } = React.useContext(ConfigContext);
+
   return (
     <div className={`${styles.imageGridWrapper} ${styles.shimmerWrapper}`}>
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
-      <Shimmer styles={shimmerStyles} />
+      {Array(pageSize)
+        .fill("")
+        .map(() => (
+          <Shimmer
+            styles={shimmerStyles}
+            style={{ minWidth: columnCountDict[columnCount], maxWidth: columnCountDict[columnCount] }}
+          />
+        ))}
     </div>
   );
 }

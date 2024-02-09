@@ -19,11 +19,16 @@ import { Post } from "../models/Post";
 import { commentService } from "./commenService";
 import { findIndex } from "@microsoft/sp-lodash-subset";
 
+export interface IImageServiceOptions {
+  disableComments: boolean;
+  pageSize?: number;
+}
+
 export interface IImageService {
-  getAllPosts(): Promise<Post[]>;
-  getAllUsersPosts(): Promise<Post[]>;
-  getAllUsersTaggedPosts(): Promise<Post[]>;
-  getNext(): Promise<Post[]>;
+  getAllPosts(config: IImageServiceOptions): Promise<Post[]>;
+  getAllUsersPosts(config: IImageServiceOptions): Promise<Post[]>;
+  getAllUsersTaggedPosts(config: IImageServiceOptions): Promise<Post[]>;
+  getNext(config: IImageServiceOptions): Promise<Post[]>;
   hasNext: boolean;
 }
 
@@ -69,13 +74,15 @@ export class ImageService {
         .getByTitle("Image Gallery")
         .items.select(selectFields.join(","))
         .expand("File, Author, TaggedUsers")
-        .top(9)
         .orderBy("Created", false);
     });
   }
 
-  public async getAllPosts(disableComments = false): Promise<Post[]> {
-    const res = await this._baseQuery.filter("").getPaged<IPostServerObj[]>();
+  public async getAllPosts({ disableComments, pageSize }: IImageServiceOptions): Promise<Post[]> {
+    const res = await this._baseQuery
+      .filter("")
+      .top(pageSize || 9)
+      .getPaged<IPostServerObj[]>();
     this._next = res.getNext.bind(res);
     this.hasNext = res.hasNext;
     const posts = res?.results.map((r) => new Post(r)) || [];
@@ -83,8 +90,9 @@ export class ImageService {
     return posts;
   }
 
-  public async getAllUsersPosts(disableComments = false): Promise<Post[]> {
+  public async getAllUsersPosts({ disableComments, pageSize }: IImageServiceOptions): Promise<Post[]> {
     const res = await this._baseQuery
+      .top(pageSize || 9)
       .filter(`Author/EMail eq '${userService.currentUser().email}'`)
       .getPaged<IPostServerObj[]>();
     this._next = res.getNext.bind(res);
@@ -94,9 +102,10 @@ export class ImageService {
     return posts;
   }
 
-  public async getAllUsersTaggedPosts(disableComments = false): Promise<Post[]> {
+  public async getAllUsersTaggedPosts({ disableComments, pageSize }: IImageServiceOptions): Promise<Post[]> {
     const res = await this._baseQuery
       .filter(`TaggedUsers/EMail eq '${userService.currentUser().email}'`)
+      .top(pageSize || 9)
       .getPaged<IPostServerObj[]>();
     this._next = res.getNext.bind(res);
     this.hasNext = res.hasNext;
@@ -105,7 +114,7 @@ export class ImageService {
     return posts;
   }
 
-  public async getNext(disableComments = false): Promise<Post[]> {
+  public async getNext({ disableComments, pageSize }: IImageServiceOptions): Promise<Post[]> {
     const res = await this._next();
     this._next = res?.getNext.bind(res);
     this.hasNext = res?.hasNext || false;

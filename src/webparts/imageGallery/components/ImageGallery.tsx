@@ -4,7 +4,7 @@ import { PivotItem } from "@fluentui/react";
 import { ALL } from "./strings";
 import { Post } from "../../../models/Post";
 
-import { imageService } from "../../../services/imageService";
+import { IImageServiceOptions, imageService } from "../../../services/imageService";
 import { userService } from "../../../services/userService";
 
 import { useConfig } from "../../../hooks/useConfig";
@@ -36,26 +36,28 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
   const [isImageViewerVisible, { toggle: toggleImageViewerVisible }] = useBoolean(false);
   const [isGridLoading, { setTrue: gridLoading, setFalse: gridDoneLoading }] = useBoolean(false);
 
-  const { carouselHeader, layout } = React.useContext(ConfigContext);
+  const { carouselHeader, appType } = React.useContext(ConfigContext);
 
   const [config, updateConfig] = useConfig();
+  const { pageSize } = React.useContext(ConfigContext);
 
   console.log(isAdmin);
+  const configOptions: IImageServiceOptions = { disableComments: config.DisableAllComments, pageSize };
 
   React.useEffect(() => {
     (async () => {
       setSelectedCategory(ALL);
       gridLoading();
-      const _posts = await imageService.getAllPosts(config.DisableAllComments);
+      const _posts = await imageService.getAllPosts(configOptions);
       setPosts(_posts);
       gridDoneLoading();
       userService.currentUserHasFullControlOnImageList().then(setIsAdmin).catch(console.error);
     })();
-  }, [config]);
+  }, [config, pageSize]);
 
   let app: JSX.Element;
-
-  switch (layout) {
+  console.log(appType);
+  switch (appType) {
     case AppType.Grid:
       app = (
         <GridApp
@@ -140,7 +142,7 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
 
   async function handleLoadMore(): Promise<void> {
     if (imageService.hasNext && imageService.getNext) {
-      const nextSet = await imageService.getNext();
+      const nextSet = await imageService.getNext(configOptions);
       if (nextSet) {
         setPosts((prev) => [...prev, ...nextSet]);
       }
@@ -152,14 +154,14 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
     if (vert) setSelectedCategory(vert);
     switch (vert) {
       case "MINE":
-        _posts = await imageService.getAllUsersPosts();
+        _posts = await imageService.getAllUsersPosts(configOptions);
         break;
       case "TAGGED":
-        _posts = await imageService.getAllUsersTaggedPosts();
+        _posts = await imageService.getAllUsersTaggedPosts(configOptions);
         break;
       case "ALL":
       default:
-        _posts = await imageService.getAllPosts();
+        _posts = await imageService.getAllPosts(configOptions);
         break;
     }
     setPosts(_posts);

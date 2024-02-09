@@ -23,10 +23,10 @@
       "webpack-env"
     ],
     "lib": [
-      "es5",
+      "es6",
       "dom",
       "es2015.collection",
-      "es2015.promise"
+      "es2015.promise",
     ]
   },
   "include": [

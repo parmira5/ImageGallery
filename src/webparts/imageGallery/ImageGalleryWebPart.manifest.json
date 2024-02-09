@@ -23,8 +23,12 @@
       "description": { "default": "image-gallery description" },
       "officeFabricIconFontName": "Page",
       "properties": {
-        "description": "image-gallery",
-        "carouselHeader": ""
+        "carouselHeader": "",
+        "appType": 2,
+        "columnCount": 3,
+        "showSeeAll": true,
+        "showSubmit": true,
+        "pageSize": 9
       }
     }
   ]
