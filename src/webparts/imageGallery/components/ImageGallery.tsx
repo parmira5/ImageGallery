@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PivotItem } from "@fluentui/react";
+// import { PivotItem } from "@fluentui/react";
 
 import { ALL } from "./strings";
 import { Post } from "../../../models/Post";
@@ -15,7 +15,6 @@ import { ImageViewer } from "./ImageViewer/ImageViewer";
 import { DisplayMode } from "@microsoft/sp-core-library";
 import { ConfigContext } from "../../../context/ConfigContext";
 import { AppType } from "../../../models/AppType";
-import { FullPageApp } from "./FullPageApp";
 import { CarouselApp } from "./CarouselApp";
 import { GridApp } from "./GridApp";
 
@@ -42,6 +41,7 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
   const { pageSize } = React.useContext(ConfigContext);
 
   console.log(isAdmin);
+  console.log(selectedCategory);
   const configOptions: IImageServiceOptions = { disableComments: config.DisableAllComments, pageSize };
 
   React.useEffect(() => {
@@ -56,7 +56,6 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
   }, [config, pageSize]);
 
   let app: JSX.Element;
-  console.log(appType);
   switch (appType) {
     case AppType.Grid:
       app = (
@@ -74,6 +73,7 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
       );
       break;
     case AppType.Carousel:
+    default:
       app = (
         <CarouselApp
           displayMode={displayMode}
@@ -82,26 +82,6 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
           onClickItem={handleClickImage}
           onClickSettings={toggleAdminVisible}
           posts={posts}
-        />
-      );
-      break;
-    case AppType.FullPageApp:
-    default:
-      app = (
-        <FullPageApp
-          config={config}
-          hasNext={imageService.hasNext}
-          isLoading={isGridLoading}
-          onClickFilterButton={handleClickFilterButton}
-          onClickItem={handleClickImage}
-          onClickMore={handleLoadMore}
-          onSettingsButtonClick={toggleAdminVisible}
-          onSubmitPhotoButtonClick={() => console.log("")}
-          posts={posts}
-          selectedCategory={selectedCategory}
-          showAdminControls={isAdminVisible}
-          toggleAdminPanelVisible={toggleAdminVisible}
-          onPivotClick={handlePivotClick}
         />
       );
       break;
@@ -121,19 +101,19 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
     </>
   );
 
-  async function handlePivotClick(selectedCategory: PivotItem): Promise<void> {
-    if (selectedCategory.props.itemKey) {
-      gridLoading();
-      await handleVerticalChange(selectedCategory.props.itemKey);
-      gridDoneLoading();
-    }
-  }
+  // async function handlePivotClick(selectedCategory: PivotItem): Promise<void> {
+  //   if (selectedCategory.props.itemKey) {
+  //     gridLoading();
+  //     await handleVerticalChange(selectedCategory.props.itemKey);
+  //     gridDoneLoading();
+  //   }
+  // }
 
-  async function handleClickFilterButton(selectedKey: string): Promise<void> {
-    gridLoading();
-    await handleVerticalChange(selectedKey);
-    gridDoneLoading();
-  }
+  // async function handleClickFilterButton(selectedKey: string): Promise<void> {
+  //   gridLoading();
+  //   await handleVerticalChange(selectedKey);
+  //   gridDoneLoading();
+  // }
 
   function handleClickImage(post: Post): void {
     toggleImageViewerVisible();
@@ -149,23 +129,23 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
     }
   }
 
-  async function handleVerticalChange(vert: string) {
-    let _posts: Post[];
-    if (vert) setSelectedCategory(vert);
-    switch (vert) {
-      case "MINE":
-        _posts = await imageService.getAllUsersPosts(configOptions);
-        break;
-      case "TAGGED":
-        _posts = await imageService.getAllUsersTaggedPosts(configOptions);
-        break;
-      case "ALL":
-      default:
-        _posts = await imageService.getAllPosts(configOptions);
-        break;
-    }
-    setPosts(_posts);
-  }
+  // async function handleVerticalChange(vert: string) {
+  //   let _posts: Post[];
+  //   if (vert) setSelectedCategory(vert);
+  //   switch (vert) {
+  //     case "MINE":
+  //       _posts = await imageService.getAllUsersPosts(configOptions);
+  //       break;
+  //     case "TAGGED":
+  //       _posts = await imageService.getAllUsersTaggedPosts(configOptions);
+  //       break;
+  //     case "ALL":
+  //     default:
+  //       _posts = await imageService.getAllPosts(configOptions);
+  //       break;
+  //   }
+  //   setPosts(_posts);
+  // }
 };
 
 export default ImageGallery;

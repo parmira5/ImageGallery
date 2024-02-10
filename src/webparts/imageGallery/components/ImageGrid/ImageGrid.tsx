@@ -19,10 +19,10 @@ export interface IProps {
 }
 
 const columnCountDict = {
-  [ColumnCount.Two]: "49.8%",
-  [ColumnCount.Three]: "33.1%",
-  [ColumnCount.Four]: "24.7%",
-  [ColumnCount.Five]: "19.6%",
+  [ColumnCount.Two]: "calc(50% - 1px)",
+  [ColumnCount.Three]: "calc(33.33% - 1px)",
+  [ColumnCount.Four]: "calc(25% - 1px)",
+  [ColumnCount.Five]: "calc(20% - 1px)",
 };
 
 export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading }: IProps): JSX.Element => {

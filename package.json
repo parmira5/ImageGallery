@@ -13,8 +13,6 @@
     "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"
   },
   "dependencies": {
-    "@dnd-kit/core": "6.0.5",
-    "@dnd-kit/sortable": "7.0.1",
     "@fluentui/react": "^8.114.4",
     "@fluentui/react-components": "^9.45.0",
     "@fluentui/react-motion-preview": "^0.5.10",
