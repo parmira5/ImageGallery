@@ -1,2 +1,2 @@
-// export * from "./IPropertyPaneImagePicker";
-// export * from "./PropertyPaneImagePicker";
+export * from "./IPropertyPaneFilterPicker";
+export * from "./PropertyPaneFilterPicker";

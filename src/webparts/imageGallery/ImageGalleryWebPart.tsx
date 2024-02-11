@@ -7,6 +7,7 @@ import {
   PropertyPaneToggle,
   PropertyPaneTextField,
   PropertyPaneSlider,
+  PropertyPaneLabel,
 } from "@microsoft/sp-property-pane";
 import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
 
@@ -21,6 +22,8 @@ import { ConfigContext } from "../../context/ConfigContext";
 import { AppType } from "../../models/AppType";
 import { ColumnCount } from "../../models/ColumnCount";
 import { FilterType } from "../../models/FilterType";
+import { PropertyPaneFilterPicker } from "../../propertyPane/PropertyPaneImagePicker";
+import { IFilter } from "../../propertyPane/PropertyPaneImagePicker/Filter";
 
 export interface IImageGalleryWebPartProps {
   appType: AppType;
@@ -30,6 +33,8 @@ export interface IImageGalleryWebPartProps {
   showSubmit: boolean;
   pageSize: number;
   showPaginationControl: boolean;
+  filters: IFilter[]
+  filterType: FilterType;
 }
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
@@ -73,15 +78,19 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
         ? [
           PropertyPaneChoiceGroup("columnCount", {
             options: [
-              { key: ColumnCount.Two, text: "Two" },
-              { key: ColumnCount.Three, text: "Three" },
-              { key: ColumnCount.Four, text: "Four" },
-              { key: ColumnCount.Five, text: "Five" },
+              { key: ColumnCount.One, text: "Single", iconProps: { officeFabricIconFontName: "SingleColumn" } },
+              { key: ColumnCount.Two, text: "Double", iconProps: { officeFabricIconFontName: "DoubleColumn" } },
+              { key: ColumnCount.Three, text: "Triple", iconProps: { officeFabricIconFontName: "TripleColumn" } },
+              { key: ColumnCount.Four, text: "Quad", iconProps: { officeFabricIconFontName: "QuadColumn" } },
             ],
           }),
           PropertyPaneToggle("showPaginationControl", { label: "Show Pagination Control" }),
         ]
         : [];
+    const inlineFilterFields = this.properties.filterType === FilterType.Inline ? [
+      PropertyPaneLabel("", { text: "'Apply to All' filters will be applied to all queries and combined using the AND operator." }),
+      PropertyPaneFilterPicker("filters", { filters: this.properties.filters })
+    ] : [];
     return {
       pages: [
         {
@@ -118,10 +127,11 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
         },
         {
           header: {
-            description: "Filters",
+            description: "Webpart Configuration",
           },
           groups: [
             {
+              groupName: "Filters",
               groupFields: [
                 PropertyPaneChoiceGroup("filterType", {
                   label: "Source",
@@ -130,6 +140,7 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
                     { key: FilterType.Dynamic, text: "Dynamic" },
                   ],
                 }),
+                ...inlineFilterFields
               ],
             },
           ],

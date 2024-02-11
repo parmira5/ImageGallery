@@ -4,7 +4,7 @@ import { Guid } from "@microsoft/sp-core-library";
 import { PrimaryButton } from "@fluentui/react";
 import { findIndex } from "lodash";
 
-interface IProps {
+export interface IProps {
     filters: IFilter[];
     onChange: (filters: IFilter[]) => void
 }

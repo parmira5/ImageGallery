@@ -40,10 +40,8 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
   const isDynamic = valueType === "Dynamic";
   const isVertical = filterType === "Vertical";
 
-  React.useEffect(() => { console.log("hi") }, []);
-
   return (
-    <div className={styles.container}>
+    <div id={filter.id} key={filter.id} className={styles.container}>
       <ChoiceGroup defaultSelectedKey={filterType} label="Filter type" options={[{ key: "All", text: "Apply to All" }, { key: "Vertical", text: "Add as Vertical" }]} styles={{ flexContainer: { display: "flex", gap: "1.5em", flexDirection: "row" }, root: { marginBottom: "1em" } }} onChange={handleFilterTypeChange} />
       {isVertical && <TextField label="Filter display name" value={verticalName} onChange={handleChangeVerticalName} />}
       <Dropdown options={[{ key: "test", text: "test" }]} label="Filter property" selectedKey={filterProperty} onChange={handleChangeFilterProperty} />
