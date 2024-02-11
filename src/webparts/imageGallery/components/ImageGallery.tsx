@@ -17,6 +17,8 @@ import { ConfigContext } from "../../../context/ConfigContext";
 import { AppType } from "../../../models/AppType";
 import { CarouselApp } from "./CarouselApp";
 import { GridApp } from "./GridApp";
+import { IFilter } from "../../../propertyPane/PropertyPaneImagePicker/Filter";
+import { FilterPicker } from "../../../propertyPane/PropertyPaneImagePicker/FilterPicker";
 
 interface IProps {
   displayMode: DisplayMode;
@@ -34,6 +36,10 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
   const [isAdminVisible, { toggle: toggleAdminVisible }] = useBoolean(false);
   const [isImageViewerVisible, { toggle: toggleImageViewerVisible }] = useBoolean(false);
   const [isGridLoading, { setTrue: gridLoading, setFalse: gridDoneLoading }] = useBoolean(false);
+  const [filters, setFilters] = React.useState<IFilter[]>([]);
+
+  console.log(filters);
+
 
   const { carouselHeader, appType } = React.useContext(ConfigContext);
 
@@ -89,6 +95,7 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
 
   return (
     <>
+      <FilterPicker filters={filters} onChange={setFilters} />
       {app}
       <ImageViewer
         isOpen={isImageViewerVisible}

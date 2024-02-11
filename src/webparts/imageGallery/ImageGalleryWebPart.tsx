@@ -71,16 +71,16 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
     const layoutFields =
       this.properties.appType === AppType.Grid
         ? [
-            PropertyPaneChoiceGroup("columnCount", {
-              options: [
-                { key: ColumnCount.Two, text: "Two" },
-                { key: ColumnCount.Three, text: "Three" },
-                { key: ColumnCount.Four, text: "Four" },
-                { key: ColumnCount.Five, text: "Five" },
-              ],
-            }),
-            PropertyPaneToggle("showPaginationControl", { label: "Show Pagination Control" }),
-          ]
+          PropertyPaneChoiceGroup("columnCount", {
+            options: [
+              { key: ColumnCount.Two, text: "Two" },
+              { key: ColumnCount.Three, text: "Three" },
+              { key: ColumnCount.Four, text: "Four" },
+              { key: ColumnCount.Five, text: "Five" },
+            ],
+          }),
+          PropertyPaneToggle("showPaginationControl", { label: "Show Pagination Control" }),
+        ]
         : [];
     return {
       pages: [
@@ -124,7 +124,7 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
             {
               groupFields: [
                 PropertyPaneChoiceGroup("filterType", {
-                  label: "Filter Type",
+                  label: "Source",
                   options: [
                     { key: FilterType.Inline, text: "Inline" },
                     { key: FilterType.Dynamic, text: "Dynamic" },
