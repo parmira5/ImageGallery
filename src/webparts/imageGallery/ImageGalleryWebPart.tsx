@@ -8,6 +8,7 @@ import {
   PropertyPaneTextField,
   PropertyPaneSlider,
   PropertyPaneLabel,
+  PropertyPaneHorizontalRule,
 } from "@microsoft/sp-property-pane";
 import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
 
@@ -39,8 +40,6 @@ export interface IImageGalleryWebPartProps {
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
   public async render(): Promise<void> {
-    console.log("propertoes", this.properties);
-
     const element: React.ReactElement<IImageGalleryProps> = (
       <ConfigContext.Provider value={this.properties}>
         <ImageGallery
@@ -139,6 +138,7 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
                     { key: FilterType.Dynamic, text: "Dynamic" },
                   ],
                 }),
+                PropertyPaneHorizontalRule(),
                 ...inlineFilterFields
               ],
             },

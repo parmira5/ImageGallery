@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Filter, IFilter } from "./Filter";
 import { Guid } from "@microsoft/sp-core-library";
-import { PrimaryButton } from "@fluentui/react";
+import { ActionButton } from "@fluentui/react";
 import { findIndex } from "lodash";
 
 export interface IProps {
@@ -14,7 +14,7 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
         <div>
             {filters.map(filter => <Filter filter={filter} onChange={handleChangeFilter} onDelete={handleDelete} />)}
         </div>
-        <PrimaryButton text="Add Filter" onClick={handleAddFilter} styles={{ root: { marginTop: "1em" } }} />
+        <ActionButton iconProps={{ iconName: "Add" }} text="Add Filter" onClick={handleAddFilter} styles={{ root: { marginTop: "1em" } }} />
     </div>
 
     function handleAddFilter() {

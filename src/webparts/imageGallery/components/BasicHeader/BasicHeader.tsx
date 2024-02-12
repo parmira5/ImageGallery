@@ -15,7 +15,7 @@ export interface IProps {
   verticals: JSX.Element[]
 }
 
-export const BasicHeader = ({ displayMode, headerText, onChangeHeader, verticals }: IProps) => {
+export const BasicHeader = ({ displayMode, headerText, onChangeHeader, verticals }: IProps): JSX.Element => {
   const { showSubmit, showSeeAll } = React.useContext(ConfigContext);
   const isEditMode = displayMode === DisplayMode.Edit;
   const showHeader = displayMode === DisplayMode.Read && !!headerText;
@@ -49,7 +49,7 @@ export const BasicHeader = ({ displayMode, headerText, onChangeHeader, verticals
           />
           </div>
         )}
-        {showPivot && <div className={styles.pivotContainer}><Pivot overflowBehavior="menu">{verticals}</Pivot></div>}
+        {showPivot && <div key={verticals.length} className={styles.pivotContainer}><Pivot overflowBehavior="menu">{verticals}</Pivot></div>}
       </div>
     </div>
   );
