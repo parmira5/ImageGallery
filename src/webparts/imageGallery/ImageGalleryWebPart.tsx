@@ -103,7 +103,6 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
               groupFields: [
                 PropertyPaneChoiceGroup("appType", {
                   options: [
-                    { key: AppType.FullPageApp, text: "Full Page (Requires full width or SPA page)" },
                     { key: AppType.Grid, text: "Grid" },
                     { key: AppType.Carousel, text: "Carousel" },
                   ],

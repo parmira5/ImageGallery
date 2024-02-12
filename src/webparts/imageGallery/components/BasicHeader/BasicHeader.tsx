@@ -1,23 +1,25 @@
-import { TextField, Link, ActionButton, Text } from "@fluentui/react";
+import { TextField, Link, ActionButton, Text, Pivot } from "@fluentui/react";
 import * as React from "react";
 import styles from "./BasicHeader.module.scss";
 import { DisplayMode } from "@microsoft/sp-core-library";
 import { ConfigContext } from "../../../../context/ConfigContext";
+import { submitButtonStyles } from "./fluentui.styles";
 
 export interface IProps {
-  onClickSettings: () => void;
   onChangeHeader: (
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
   ) => void;
   headerText: string;
   displayMode: DisplayMode;
+  verticals: JSX.Element[]
 }
 
-export const BasicHeader = ({ displayMode, headerText, onChangeHeader, onClickSettings }: IProps) => {
+export const BasicHeader = ({ displayMode, headerText, onChangeHeader, verticals }: IProps) => {
   const { showSubmit, showSeeAll } = React.useContext(ConfigContext);
   const isEditMode = displayMode === DisplayMode.Edit;
   const showHeader = displayMode === DisplayMode.Read && !!headerText;
+  const showPivot = verticals.length > 0;
   return (
     <div className={styles.basicHeader}>
       <div className={styles.topRow}>
@@ -37,15 +39,17 @@ export const BasicHeader = ({ displayMode, headerText, onChangeHeader, onClickSe
         )}
         {showSeeAll && <Link style={{ marginLeft: "auto" }}>See all</Link>}
       </div>
-      <div className={styles.topRow}>
+      <div className={styles.bottomRow}>
         {showSubmit && (
-          <ActionButton
-            styles={{ root: { paddingLeft: 0, marginBottom: 10 }, icon: { marginLeft: 0 } }}
+          <div className={`${showPivot ? styles.absolute + " " : ""}${styles.buttonContainer}`}><ActionButton
+            styles={submitButtonStyles}
             key="hi"
             iconProps={{ iconName: "Add" }}
             text="Submit a Photo"
           />
+          </div>
         )}
+        {showPivot && <div className={styles.pivotContainer}><Pivot overflowBehavior="menu">{verticals}</Pivot></div>}
       </div>
     </div>
   );

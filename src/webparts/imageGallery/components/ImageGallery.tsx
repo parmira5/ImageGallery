@@ -15,8 +15,12 @@ import { ImageViewer } from "./ImageViewer/ImageViewer";
 import { DisplayMode } from "@microsoft/sp-core-library";
 import { ConfigContext } from "../../../context/ConfigContext";
 import { AppType } from "../../../models/AppType";
-import { CarouselApp } from "./CarouselApp";
-import { GridApp } from "./GridApp";
+
+import { IFilter } from "../../../propertyPane/PropertyPaneImagePicker/Filter";
+import { PivotItem } from "@fluentui/react";
+import { BasicHeader } from "./BasicHeader/BasicHeader";
+import { ImageGrid } from "./ImageGrid/ImageGrid";
+import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
 
 interface IProps {
   displayMode: DisplayMode;
@@ -24,6 +28,15 @@ interface IProps {
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
   ) => void;
+}
+
+function filterBuilder(filters: IFilter[]): string {
+  return filters.map((filter) => {
+    if (filter.operator === "startsWith" || filter.operator === "contains") {
+      return `${filter.operator}(${filter.filterProperty}, '${filter.filterValue}')`
+    }
+    return `${filter.filterProperty} ${filter.operator} '${filter.filterValue}'`
+  }).join(" AND ");
 }
 
 const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
@@ -38,10 +51,16 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
   const { carouselHeader, appType } = React.useContext(ConfigContext);
 
   const [config, updateConfig] = useConfig();
-  const { pageSize } = React.useContext(ConfigContext);
+  const { pageSize, filters } = React.useContext(ConfigContext);
 
   console.log(isAdmin);
   console.log(selectedCategory);
+  console.log(filters);
+  console.log(filterBuilder(filters));
+
+  const verticals = filters.filter(filter => filter.filterType === "Vertical").map(filter => <PivotItem key={filter.verticalName} headerText={filter.verticalName} />)
+  const isCarousel = appType === AppType.Carousel;
+
   const configOptions: IImageServiceOptions = { disableComments: config.DisableAllComments, pageSize };
 
   React.useEffect(() => {
@@ -55,41 +74,26 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
     })();
   }, [config, pageSize]);
 
-  let app: JSX.Element;
-  switch (appType) {
-    case AppType.Grid:
-      app = (
-        <GridApp
-          displayMode={displayMode}
-          hasNext={imageService.hasNext}
-          headerText={carouselHeader}
-          isLoading={isGridLoading}
-          onChangeHeader={onChangeCarouselHeader}
-          onClickItem={handleClickImage}
-          onClickMore={handleLoadMore}
-          onClickSettings={toggleAdminVisible}
-          posts={posts}
-        />
-      );
-      break;
-    case AppType.Carousel:
-    default:
-      app = (
-        <CarouselApp
-          displayMode={displayMode}
-          headerText={carouselHeader}
-          onChangeHeader={onChangeCarouselHeader}
-          onClickItem={handleClickImage}
-          onClickSettings={toggleAdminVisible}
-          posts={posts}
-        />
-      );
-      break;
-  }
-
   return (
     <>
-      {app}
+      <BasicHeader
+        displayMode={displayMode}
+        headerText={carouselHeader}
+        onChangeHeader={onChangeCarouselHeader}
+        verticals={verticals}
+      />
+      {!isCarousel && <>
+        <ImageGrid
+          posts={posts}
+          onClickItem={handleClickImage}
+          onClickMore={handleLoadMore}
+          hasNext={imageService.hasNext}
+          isLoading={isGridLoading}
+        />
+      </>}
+      {isCarousel && <>
+        <ImageCarousel onClickItem={handleClickImage} posts={posts} />
+      </>}
       <ImageViewer
         isOpen={isImageViewerVisible}
         onDismiss={toggleImageViewerVisible}

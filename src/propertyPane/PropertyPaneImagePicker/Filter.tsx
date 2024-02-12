@@ -2,19 +2,19 @@ import * as React from "react";
 import styles from "./FilterPicker.module.scss";
 import { ActionButton, ChoiceGroup, Dropdown, IChoiceGroupOption, IDropdownOption, ISelectableOption, TextField } from "@fluentui/react";
 
-type Operator = "EQUALS" | "NOTEQUALS" | "CONTAINS" | "STARTSWITH" | "LESSTHAN" | "GREATERTHAN";
+type Operator = "eq" | "ne" | "contains" | "startsWith" | "lt" | "gt";
 
 interface IOperatorOption extends ISelectableOption {
   key: Operator
 }
 
 const operators: IOperatorOption[] = [
-  { key: "EQUALS", text: "Equals" },
-  { key: "CONTAINS", text: "Contains" },
-  { key: "GREATERTHAN", text: "Greater Than" },
-  { key: "LESSTHAN", text: "Less Than" },
-  { key: "NOTEQUALS", text: "Doesn't Equal" },
-  { key: "STARTSWITH", text: "Begins With" },
+  { key: "eq", text: "Equals" },
+  { key: "contains", text: "Contains" },
+  { key: "gt", text: "Greater Than" },
+  { key: "lt", text: "Less Than" },
+  { key: "ne", text: "Doesn't Equal" },
+  { key: "startsWith", text: "Begins With" },
 ]
 
 export interface IFilter {

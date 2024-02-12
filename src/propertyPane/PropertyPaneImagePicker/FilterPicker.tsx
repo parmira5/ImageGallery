@@ -39,5 +39,5 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
 }
 
 export function createNewFilter(): IFilter {
-    return { id: Guid.newGuid().toString(), filterProperty: "test", filterType: "All", filterValue: "test", valueType: "Static", verticalName: "", operator: "EQUALS" }
+    return { id: Guid.newGuid().toString(), filterProperty: "test", filterType: "All", filterValue: "test", valueType: "Static", verticalName: "", operator: "eq" }
 }
