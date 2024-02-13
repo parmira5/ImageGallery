@@ -22,6 +22,7 @@ import { findIndex } from "@microsoft/sp-lodash-subset";
 export interface IImageServiceOptions {
   disableComments: boolean;
   pageSize?: number;
+  filter?: string;
 }
 
 export interface IImageService {
@@ -78,9 +79,9 @@ export class ImageService {
     });
   }
 
-  public async getAllPosts({ disableComments, pageSize }: IImageServiceOptions): Promise<Post[]> {
+  public async getAllPosts({ disableComments, pageSize, filter = "" }: IImageServiceOptions): Promise<Post[]> {
     const res = await this._baseQuery
-      .filter("")
+      .filter(filter)
       .top(pageSize || 9)
       .getPaged<IPostServerObj[]>();
     this._next = res.getNext.bind(res);
