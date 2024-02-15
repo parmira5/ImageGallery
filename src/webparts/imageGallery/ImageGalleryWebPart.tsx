@@ -42,6 +42,7 @@ export interface IImageGalleryWebPartProps {
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
   public async render(): Promise<void> {
+    if (!this.properties) return;
     const element: React.ReactElement<IImageGalleryProps> = (
       <ConfigContext.Provider value={this.properties}>
         <ImageGallery

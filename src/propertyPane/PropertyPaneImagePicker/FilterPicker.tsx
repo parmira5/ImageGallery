@@ -33,8 +33,16 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
 
   function handleChangeFilter(filter: IFilter) {
     const idx = findIndex(filters, (_filter) => _filter.id === filter.id);
-    const filtersCopy = [...filters];
+    let filtersCopy = [...filters];
+    console.log(filter.isDefault);
+    if (filter.isDefault) {
+      filtersCopy = filtersCopy.map((f) => {
+        f.isDefault = false;
+        return f;
+      });
+    }
     filtersCopy[idx] = filter;
+    console.log(filtersCopy);
     onChange(filtersCopy);
   }
 
@@ -57,6 +65,7 @@ export function createNewFilter(): IFilter {
     valueType: "Static",
     operator: "eq",
     isNoFilter: false,
+    isDefault: false,
     verticalName: "",
   };
 }

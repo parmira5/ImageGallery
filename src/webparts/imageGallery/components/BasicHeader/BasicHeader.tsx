@@ -12,14 +12,20 @@ export interface IProps {
   ) => void;
   headerText: string;
   displayMode: DisplayMode;
-  filterElement: JSX.Element;
+  filterElement?: JSX.Element;
+  showFilters?: boolean;
 }
 
-export const BasicHeader = ({ displayMode, headerText, onChangeHeader, filterElement }: IProps): JSX.Element => {
+export const BasicHeader = ({
+  displayMode,
+  headerText,
+  onChangeHeader,
+  filterElement,
+  showFilters = false,
+}: IProps): JSX.Element => {
   const { showSubmit, showSeeAll } = React.useContext(ConfigContext);
   const isEditMode = displayMode === DisplayMode.Edit;
   const showHeader = displayMode === DisplayMode.Read && !!headerText;
-  const showPivot = !!filterElement;
   return (
     <div className={styles.basicHeader}>
       <div className={styles.topRow}>
@@ -41,15 +47,11 @@ export const BasicHeader = ({ displayMode, headerText, onChangeHeader, filterEle
       </div>
       <div className={styles.bottomRow}>
         {showSubmit && (
-          <div className={`${showPivot ? styles.absolute + " " : ""}${styles.buttonContainer}`}>
+          <div className={`${showFilters ? styles.absolute + " " : ""}${styles.buttonContainer}`}>
             <ActionButton styles={submitButtonStyles} key="hi" iconProps={{ iconName: "Add" }} text="Submit a Photo" />
           </div>
         )}
-        {showPivot && (
-          <div key={filterElement.props.children.length} className={styles.pivotContainer}>
-            {filterElement}
-          </div>
-        )}
+        {showFilters && filterElement && <div className={styles.pivotContainer}>{filterElement}</div>}
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ export const panelStyles: Partial<IPanelStyles> = {
   },
 };
 
-export const pageBtnStyles: Partial<IButtonStyles> = { root: { alignSelf: "center" } };
+export const pageBtnStyles: Partial<IButtonStyles> = { root: { alignSelf: "center", margin: "auto" } };
 
 export const shimmerStyles: Partial<IShimmerStyles> = {
   root: { minWidth: "33.2%", maxWidth: "33.2%", aspectRatio: "1/1" },

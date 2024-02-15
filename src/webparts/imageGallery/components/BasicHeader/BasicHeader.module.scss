@@ -18,6 +18,9 @@
     margin-bottom: .25em;
     align-items: self-end;
     margin-bottom: 10px;
+    @media screen and (max-width: 640px) {
+        justify-content: space-between;
+    }
 
 }
 
@@ -25,14 +28,9 @@
     margin-left: auto;
     margin-right: auto;
 
-    @media screen and (max-width: 1024px) {
-        margin-right: 0;
-    }
-
     @media screen and (max-width: 640px) {
-        margin-left: 0;
-        flex-grow: 1;
         min-width: 0;
+        margin-right: 0;
     }
 }
 

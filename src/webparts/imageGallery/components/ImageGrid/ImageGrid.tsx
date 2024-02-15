@@ -49,7 +49,9 @@ export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading 
         </div>
       ))}
       {hasNext && showPaginationControl && (
-        <ActionButton styles={pageBtnStyles} iconProps={pageBtnIcon} text={LOAD_MORE} onClick={onClickMore} />
+        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+          <ActionButton styles={pageBtnStyles} iconProps={pageBtnIcon} text={LOAD_MORE} onClick={onClickMore} />
+        </div>
       )}
     </section>
   );

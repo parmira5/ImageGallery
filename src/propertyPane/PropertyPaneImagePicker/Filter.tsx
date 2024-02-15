@@ -34,7 +34,7 @@ interface IProps {
 
 export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
   const [columns, setColumns] = React.useState<IDropdownOption[]>([]);
-  const { filterProperty, filterType, filterValue, valueType, verticalName, operator, isNoFilter } = filter;
+  const { filterProperty, filterType, filterValue, valueType, verticalName, operator, isNoFilter, isDefault } = filter;
 
   const isDynamic = valueType === "Dynamic";
   const isVertical = filterType === "Vertical";
@@ -58,7 +58,12 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
         }}
         onChange={handleFilterTypeChange}
       />
-      {isVertical && <Checkbox label="No filter" onChange={handleChangeNoFilter} checked={isNoFilter} />}
+      {isVertical && (
+        <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+          <Checkbox label="No filter" onChange={handleChangeNoFilter} checked={isNoFilter} />{" "}
+          <Checkbox label="Make default" onChange={handleCheckDefault} checked={isDefault} />
+        </div>
+      )}
       {isVertical && <TextField label="Filter display name" value={verticalName} onChange={handleChangeVerticalName} />}
       {!isNoFilter && (
         <>
@@ -82,7 +87,10 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
           {!isDynamic && <TextField value={filterValue.toString()} onChange={handleStaticValueChange} label="Value" />}
           {isDynamic && (
             <Dropdown
-              options={[{ key: "test", text: "test" }]}
+              options={[
+                { key: "USER_EMAIL", text: "User's Email" },
+                { key: "TODAY", text: "Today's Date" },
+              ]}
               selectedKey={filterValue}
               onChange={handleDynamicValueChange}
               label="Value"
@@ -102,7 +110,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
   function handleValueTypeChange(
     ev?: React.FormEvent<HTMLElement | HTMLInputElement> | undefined,
     option?: IChoiceGroupOption | undefined
-  ) {
+  ): void {
     if (option && (option.key === "Static" || option.key === "Dynamic")) {
       onChange({ ...filter, valueType: option.key });
     }
@@ -111,7 +119,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
   function handleFilterTypeChange(
     ev?: React.FormEvent<HTMLElement | HTMLInputElement> | undefined,
     option?: IChoiceGroupOption | undefined
-  ) {
+  ): void {
     if (option && (option.key === "All" || option.key === "Vertical")) {
       onChange({ ...filter, filterType: option.key, verticalName: option.key === "All" ? "" : verticalName });
     }
@@ -120,7 +128,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
   function handleStaticValueChange(
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
-  ) {
+  ): void {
     onChange({ ...filter, filterValue: newValue || "" });
   }
 
@@ -128,7 +136,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption<any> | undefined,
     index?: number | undefined
-  ) {
+  ): void {
     if (option) onChange({ ...filter, filterValue: option.key });
   }
 
@@ -136,14 +144,14 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption<any> | undefined,
     index?: number | undefined
-  ) {
+  ): void {
     if (option) onChange({ ...filter, filterProperty: option.key.toString() });
   }
 
   function handleChangeVerticalName(
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
-  ) {
+  ): void {
     onChange({ ...filter, verticalName: newValue || "" });
   }
 
@@ -151,7 +159,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption<IOperatorOption> | undefined,
     index?: number | undefined
-  ) {
+  ): void {
     if (option && option.key) {
       onChange({ ...filter, operator: option.key as Operator });
     }
@@ -160,11 +168,18 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
   function handleChangeNoFilter(
     ev?: React.FormEvent<HTMLElement | HTMLInputElement> | undefined,
     checked?: boolean | undefined
-  ) {
+  ): void {
     onChange({ ...filter, isNoFilter: !!checked, filterProperty: "", filterValue: "" });
   }
 
-  function handleDelete() {
+  function handleDelete(): void {
     onDelete(filter.id);
+  }
+
+  function handleCheckDefault(
+    ev?: React.FormEvent<HTMLElement | HTMLInputElement> | undefined,
+    checked?: boolean | undefined
+  ): void {
+    onChange({ ...filter, isDefault: !!checked });
   }
 }

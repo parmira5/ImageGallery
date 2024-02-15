@@ -12,5 +12,5 @@ export const ConfigContext = React.createContext<IImageGalleryWebPartProps>({
   pageSize: 9,
   showPaginationControl: true,
   filters: [],
-  filterType: FilterType.Inline
+  filterType: FilterType.Inline,
 });

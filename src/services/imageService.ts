@@ -23,6 +23,7 @@ export interface IImageServiceOptions {
   disableComments: boolean;
   pageSize?: number;
   filter?: string;
+  baseQuery?: string;
 }
 
 export interface IImageService {
@@ -79,9 +80,15 @@ export class ImageService {
     });
   }
 
-  public async getAllPosts({ disableComments, pageSize, filter = "" }: IImageServiceOptions): Promise<Post[]> {
+  public async getAllPosts({
+    disableComments,
+    pageSize,
+    filter = "",
+    baseQuery = "",
+  }: IImageServiceOptions): Promise<Post[]> {
+    const combinedQuery = [baseQuery, filter].filter((q) => !!q).join(" and                        ");
     const res = await this._baseQuery
-      .filter(filter)
+      .filter(combinedQuery)
       .top(pageSize || 9)
       .getPaged<IPostServerObj[]>();
     this._next = res.getNext.bind(res);
@@ -126,12 +133,16 @@ export class ImageService {
 
   private async mergeCommentCount(_posts: Post[]): Promise<Post[]> {
     const commentCounts = await commentService.batchGetCommentCount(_posts);
-    const postCopy = [..._posts];
-    commentCounts.forEach((commentCount) => {
-      const i = findIndex(postCopy, (post) => post.id === commentCount.value[0].itemId);
-      postCopy[i].comments = new CommentsRepository(commentCount);
-    });
-    return postCopy;
+    if (commentCounts.length > 0) {
+      const postCopy = [..._posts];
+      commentCounts.forEach((commentCount) => {
+        if (commentCount.value.length > 0) {
+          const i = findIndex(postCopy, (post) => post.id === commentCount.value[0].itemId);
+          postCopy[i].comments = new CommentsRepository(commentCount);
+        }
+      });
+      return postCopy;
+    } else return _posts;
   }
 }
 
