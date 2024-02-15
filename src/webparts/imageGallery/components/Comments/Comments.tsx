@@ -72,7 +72,7 @@ export const Comments = React.forwardRef(
               placeHolder="Enter a Comment"
             />
           </div>
-          {isLoading && <CommentsShimmer></CommentsShimmer>}
+          {isLoading && <CommentsShimmer />}
           {!isLoading && (
             <InfiniteScroll
               pageStart={0}
@@ -160,9 +160,9 @@ export const Comments = React.forwardRef(
   }
 );
 
-function CommentsShimmer() {
+function CommentsShimmer(): JSX.Element {
   const wrapperStyles = { display: "flex" };
-  const getCustomElements = () => {
+  const getCustomElements = (): JSX.Element => {
     return (
       <div style={wrapperStyles}>
         <ShimmerElementsGroup
@@ -186,9 +186,11 @@ function CommentsShimmer() {
 
   return (
     <div className={styles.shimmerContainer}>
-      {Array(20).fill(null).map((_) => (
-        <Shimmer customElementsGroup={getCustomElements()}></Shimmer>
-      ))}
+      {Array(20)
+        .fill(null)
+        .map((_, i) => (
+          <Shimmer key={i} customElementsGroup={getCustomElements()} />
+        ))}
     </div>
   );
 }

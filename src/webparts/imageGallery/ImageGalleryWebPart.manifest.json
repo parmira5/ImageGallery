@@ -33,7 +33,9 @@
         "showSubmit": true,
         "pageSize": 9,
         "filters": [],
-        "filterType": 1
+        "filterType": 1,
+        "commentsDisabled": false,
+        "taggingDisabled": false
       }
     }
   ]

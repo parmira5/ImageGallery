@@ -10,12 +10,12 @@ export interface IProps {
   onChange: (filters: IFilter[]) => void;
 }
 
-export const FilterPicker = ({ filters, onChange }: IProps) => {
+export const FilterPicker = ({ filters, onChange }: IProps): JSX.Element => {
   return (
     <div>
       <div>
-        {filters.map((filter) => (
-          <Filter filter={filter} onChange={handleChangeFilter} onDelete={handleDelete} />
+        {filters.map((filter, i) => (
+          <Filter key={i} filter={filter} onChange={handleChangeFilter} onDelete={handleDelete} />
         ))}
       </div>
       <ActionButton
@@ -27,11 +27,11 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
     </div>
   );
 
-  function handleAddFilter() {
+  function handleAddFilter(): void {
     onChange([...filters, createNewFilter()]);
   }
 
-  function handleChangeFilter(filter: IFilter) {
+  function handleChangeFilter(filter: IFilter): void {
     const idx = findIndex(filters, (_filter) => _filter.id === filter.id);
     let filtersCopy = [...filters];
     if (filter.isDefault) {
@@ -44,7 +44,7 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
     onChange(filtersCopy);
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: string): void {
     const filtersCopy = [...filters];
     const idx = findIndex(filters, (_filter) => _filter.id === id);
     if (idx !== -1) {

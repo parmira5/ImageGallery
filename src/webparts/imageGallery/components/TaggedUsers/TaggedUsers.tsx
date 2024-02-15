@@ -10,7 +10,7 @@ interface IProps {
   maxDisplayablePersonas: number;
 }
 
-export const TaggedUsers = ({ users, maxDisplayablePersonas }: IProps) => {
+export const TaggedUsers = ({ users, maxDisplayablePersonas }: IProps): JSX.Element => {
   const [isCalloutVisible, { toggle: toggleIsCalloutVisible }] = useBoolean(false);
 
   const facepileItems: IFacepilePersona[] = users.slice(0, maxDisplayablePersonas).map((user) => ({
@@ -48,8 +48,8 @@ export const TaggedUsers = ({ users, maxDisplayablePersonas }: IProps) => {
               onDismiss={toggleIsCalloutVisible}
               setInitialFocus
             >
-              {overFlow.map((user) => (
-                <Text variant="xSmall">
+              {overFlow.map((user, i) => (
+                <Text key={i} variant="xSmall">
                   {user.FirstName} {user.LastName}
                 </Text>
               ))}

@@ -14,6 +14,8 @@ export interface IConfigContext {
   filters: IFilterItem[];
   defaultFilter: IFilterItem | null;
   baseQuery: string;
+  commentsDisabled: boolean;
+  taggingDisabled: boolean;
 }
 
 export const ConfigContext = React.createContext<IConfigContext>({
@@ -27,4 +29,6 @@ export const ConfigContext = React.createContext<IConfigContext>({
   filters: [],
   defaultFilter: null,
   baseQuery: "",
+  commentsDisabled: false,
+  taggingDisabled: false,
 });

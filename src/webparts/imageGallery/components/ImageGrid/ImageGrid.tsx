@@ -1,4 +1,4 @@
-import { ActionButton, Shimmer } from "@fluentui/react";
+import { ActionButton, Shimmer, Spinner, SpinnerSize } from "@fluentui/react";
 import * as React from "react";
 import { Post } from "../../../../models/Post";
 import ImageCard from "../ImageCard/ImageCard";
@@ -16,6 +16,7 @@ export interface IProps {
   onClickItem: (post: Post) => void;
   onClickMore: () => void;
   isLoading: boolean;
+  isNextPageLoading: boolean;
 }
 
 const columnCountDict = {
@@ -26,7 +27,14 @@ const columnCountDict = {
   [ColumnCount.Five]: "calc(20% - 1px)",
 };
 
-export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading }: IProps): JSX.Element => {
+export const ImageGrid = ({
+  posts,
+  onClickItem,
+  onClickMore,
+  hasNext,
+  isLoading,
+  isNextPageLoading,
+}: IProps): JSX.Element => {
   const { columnCount, showPaginationControl } = React.useContext(ConfigContext);
   if (isLoading) return <ImageGridShimmer />;
   return (
@@ -50,7 +58,10 @@ export const ImageGrid = ({ posts, onClickItem, onClickMore, hasNext, isLoading 
       ))}
       {hasNext && showPaginationControl && (
         <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-          <ActionButton styles={pageBtnStyles} iconProps={pageBtnIcon} text={LOAD_MORE} onClick={onClickMore} />
+          {!isNextPageLoading && (
+            <ActionButton styles={pageBtnStyles} iconProps={pageBtnIcon} text={LOAD_MORE} onClick={onClickMore} />
+          )}
+          {isNextPageLoading && <Spinner styles={{ root: { marginTop: 10 } }} size={SpinnerSize.large} />}
         </div>
       )}
     </section>
@@ -64,8 +75,9 @@ function ImageGridShimmer(): JSX.Element {
     <div className={`${styles.imageGridWrapper} ${styles.shimmerWrapper}`}>
       {Array(pageSize)
         .fill("")
-        .map(() => (
+        .map((_, i) => (
           <Shimmer
+            key={i}
             styles={shimmerStyles}
             style={{ minWidth: columnCountDict[columnCount], maxWidth: columnCountDict[columnCount] }}
           />

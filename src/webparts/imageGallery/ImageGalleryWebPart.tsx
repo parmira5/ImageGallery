@@ -12,8 +12,8 @@ import {
 } from "@microsoft/sp-property-pane";
 import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
 
-import ImageGallery from "./components/ImageGallery";
-import { IImageGalleryProps } from "./components/IImageGalleryProps";
+import App from "./components/App";
+
 import { imageService } from "../../services/imageService";
 import { userService } from "../../services/userService";
 import { configService } from "../../services/configService";
@@ -41,6 +41,8 @@ export interface IImageGalleryWebPartProps {
   showPaginationControl: boolean;
   filters: IFilter[];
   filterType: FilterType;
+  commentsDisabled: boolean;
+  taggingDisabled: boolean;
 }
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
@@ -52,12 +54,9 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
       defaultFilter: this._getDefaultFilterOption(this.properties.filters),
       baseQuery: this._buildBaseQuery(this.properties.filters),
     };
-    const element: React.ReactElement<IImageGalleryProps> = (
+    const element: React.ReactElement<{}> = (
       <ConfigContext.Provider value={initialContext}>
-        <ImageGallery
-          onChangeCarouselHeader={this._handleChangeCarouselHeader.bind(this)}
-          displayMode={this.displayMode}
-        />
+        <App onChangeCarouselHeader={this._handleChangeCarouselHeader.bind(this)} displayMode={this.displayMode} />
       </ConfigContext.Provider>
     );
     ReactDom.render(element, this.domElement);
@@ -82,6 +81,24 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
 
   protected onThemeChanged(theme: IReadonlyTheme | undefined): void {
     this.render();
+  }
+
+  protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: any, newValue: any): void {
+    switch (propertyPath) {
+      case "commentsDisabled":
+        if (typeof newValue === "boolean") {
+          configService.getConfig().then((res) => {
+            configService.updateConfig({ ...res, DisableAllComments: newValue });
+          });
+        }
+        break;
+      case "taggingDisabled":
+        if (typeof newValue === "boolean") {
+          configService.getConfig().then((res) => {
+            configService.updateConfig({ ...res, DisableTagging: newValue });
+          });
+        }
+    }
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -162,6 +179,20 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
             },
           ],
         },
+        {
+          header: {
+            description: "Webpart Configuration",
+          },
+          groups: [
+            {
+              groupName: "Feature Flags",
+              groupFields: [
+                PropertyPaneToggle("commentsDisabled", { label: "Disable Comments" }),
+                PropertyPaneToggle("taggingDisabled", { label: "Disable Tagging" }),
+              ],
+            },
+          ],
+        },
       ],
     };
   }
@@ -174,7 +205,7 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
     this.render();
   }
 
-  private _buildQuery(filter: IFilter) {
+  private _buildQuery(filter: IFilter): string {
     if (filter.isNoFilter) return "";
     if (!filter.filterProperty || !filter.filterValue) return "";
     let value = filter.filterValue;
@@ -207,8 +238,11 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
     const filterOptions = this._buildFilterOptions(filters);
     if (filterOptions.length === 0) return null;
     const defaultOption = filterOptions.find((opt) => opt.isDefault);
-    if (defaultOption) return defaultOption;
-    return null;
+    if (defaultOption) {
+      return defaultOption;
+    } else {
+      return filterOptions[0];
+    }
   }
 
   private _resolveDynamicValue(valueName: TDynamicValue): string {
@@ -222,7 +256,7 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
     }
   }
 
-  private _buildBaseQuery(filters: IFilter[]) {
+  private _buildBaseQuery(filters: IFilter[]): string {
     return filters
       .filter((filter) => filter.filterType === "All")
       .map((filter) => this._buildQuery(filter))
