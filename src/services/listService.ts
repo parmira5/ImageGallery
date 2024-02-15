@@ -42,6 +42,11 @@ export class ListService {
       }
     });
   }
+
+  public async getCategoryOptions(listName: string): Promise<IDropdownOption[]> {
+    const field = await this._sp.web.lists.getByTitle(listName).fields.getByTitle("ImageCategory")();
+    return field.Choices?.map((choice) => ({ key: choice, text: choice })) || [];
+  }
 }
 
 export const listService = new ListService();

@@ -9,10 +9,19 @@
           "manifest": "./src/webparts/imageGallery/ImageGalleryWebPart.manifest.json"
         }
       ]
+    },
+    "image-gallery-form-form-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/imageGalleryForm/ImageGalleryFormFormCustomizer.js",
+          "manifest": "./src/extensions/imageGalleryForm/ImageGalleryFormFormCustomizer.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "ImageGalleryWebPartStrings": "lib/webparts/imageGallery/loc/{locale}.js"
+    "ImageGalleryWebPartStrings": "lib/webparts/imageGallery/loc/{locale}.js",
+    "ImageGalleryFormFormCustomizerStrings": "lib/extensions/imageGalleryForm/loc/{locale}.js"
   }
 }

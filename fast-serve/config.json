@@ -2,5 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/s-KaiNet/spfx-fast-serve/master/schema/config.latest.schema.json",
   "cli": {
     "isLibraryComponent": false
+  },
+  "serve": {
+    "openUrl": "https://r3v365.sharepoint.com/sites/NEWSSITE2/_layouts/15/SPListForm.aspx?debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fmanifests.js&loadSPFX=true&componentId=d905c92d-073e-47ee-aa66-dd698fad0418&PageType=8&RootFolder=%2Fsites%2FNEWSSITE2%2FImage+Gallery&properties=%7B%22sampleText%22%3A%22Value%22%7D"
   }
 }

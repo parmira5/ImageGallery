@@ -134,7 +134,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
 
   function handleDynamicValueChange(
     event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption<any> | undefined,
+    option?: IDropdownOption | undefined,
     index?: number | undefined
   ): void {
     if (option) onChange({ ...filter, filterValue: option.key });
@@ -142,7 +142,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
 
   function handleChangeFilterProperty(
     event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption<any> | undefined,
+    option?: IDropdownOption | undefined,
     index?: number | undefined
   ): void {
     if (option) onChange({ ...filter, filterProperty: option.key.toString() });
@@ -157,7 +157,7 @@ export function Filter({ filter, onChange, onDelete }: IProps): JSX.Element {
 
   function handleChangeOperator(
     event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption<IOperatorOption> | undefined,
+    option?: IDropdownOption | undefined,
     index?: number | undefined
   ): void {
     if (option && option.key) {

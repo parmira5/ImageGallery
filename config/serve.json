@@ -2,5 +2,53 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
   "port": 4321,
   "https": true,
-  "initialPage": "https://{tenantDomain}/_layouts/workbench.aspx"
+  "initialPage": "https://{tenantDomain}/_layouts/workbench.aspx",
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://r3v365.sharepoint.com/sites/NEWSSITE2/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "d905c92d-073e-47ee-aa66-dd698fad0418",
+        "PageType": 8,
+        "RootFolder": "/sites/NEWSSITE2/Image%20Gallery",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "imageGalleryForm_NewForm": {
+      "pageUrl": "https://r3v365.sharepoint.com/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "d905c92d-073e-47ee-aa66-dd698fad0418",
+        "PageType": 8,
+        "RootFolder": "/sites/NEWSSITE2/Lists/Image Gallery Config",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "imageGalleryForm_EditForm": {
+      "pageUrl": "https://{tenantDomain}/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "d905c92d-073e-47ee-aa66-dd698fad0418",
+        "PageType": 6,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "imageGalleryForm_ViewForm": {
+      "pageUrl": "https://{tenantDomain}/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "d905c92d-073e-47ee-aa66-dd698fad0418",
+        "PageType": 4,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    }
+  }
 }
