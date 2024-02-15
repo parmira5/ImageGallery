@@ -1,9 +1,22 @@
 import React from "react";
-import { IImageGalleryWebPartProps } from "../webparts/imageGallery/ImageGalleryWebPart";
 import { AppType } from "../models/AppType";
-import { FilterType } from "../models/FilterType";
+import { IFilterItem } from "../models/IFilterItem";
+import { ColumnCount } from "../models/ColumnCount";
 
-export const ConfigContext = React.createContext<IImageGalleryWebPartProps>({
+export interface IConfigContext {
+  carouselHeader: string;
+  appType: AppType;
+  columnCount: ColumnCount;
+  showSeeAll: boolean;
+  showSubmit: boolean;
+  pageSize: number;
+  showPaginationControl: boolean;
+  filters: IFilterItem[];
+  defaultFilter: IFilterItem | null;
+  baseQuery: string;
+}
+
+export const ConfigContext = React.createContext<IConfigContext>({
   carouselHeader: "",
   appType: AppType.Grid,
   columnCount: 3,
@@ -12,5 +25,6 @@ export const ConfigContext = React.createContext<IImageGalleryWebPartProps>({
   pageSize: 9,
   showPaginationControl: true,
   filters: [],
-  filterType: FilterType.Inline,
+  defaultFilter: null,
+  baseQuery: "",
 });

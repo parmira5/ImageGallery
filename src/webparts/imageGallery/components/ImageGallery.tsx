@@ -1,5 +1,4 @@
 import * as React from "react";
-// import { PivotItem } from "@fluentui/react";
 
 import { Post } from "../../../models/Post";
 
@@ -17,10 +16,7 @@ import { AppType } from "../../../models/AppType";
 import { BasicHeader } from "./BasicHeader/BasicHeader";
 import { ImageGrid } from "./ImageGrid/ImageGrid";
 import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
-import { IFilter } from "../../../models/IFilter";
-import { userService } from "../../../services/userService";
-import { TDynamicValue } from "../../../models/TDynamicValues";
-import { startOfDay } from "date-fns";
+
 import { Filters } from "./Filters/Filters";
 interface IProps {
   displayMode: DisplayMode;
@@ -30,64 +26,27 @@ interface IProps {
   ) => void;
 }
 
-function resolveDynamicValue(valueName: TDynamicValue): string {
-  switch (valueName) {
-    case "USER_EMAIL":
-      return userService.currentUser().email;
-    case "TODAY":
-      return startOfDay(new Date()).toISOString();
-    default:
-      return "";
-  }
-}
-
-function buildQuery(filter: IFilter) {
-  if (filter.isNoFilter) return "";
-  let value = filter.filterValue;
-  if (filter.valueType === "Dynamic" && typeof value === "string") {
-    value = resolveDynamicValue(value as TDynamicValue);
-  }
-  if (filter.operator === "startsWith" || filter.operator === "contains") {
-    return `${filter.operator}(${filter.filterProperty}, '${value}')`;
-  }
-  return `${filter.filterProperty} ${filter.operator} '${value}'`;
-}
-
 const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
+  const { pageSize, filters, carouselHeader, appType, baseQuery, defaultFilter } = React.useContext(ConfigContext);
+
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
-  const [selectedFilter, setSelectedFilter] = React.useState<string>();
+  const [filterQuery, setFilterQuery] = React.useState(defaultFilter?.itemProp || undefined);
   const [isAdminVisible, { toggle: toggleAdminVisible }] = useBoolean(false);
   const [isImageViewerVisible, { toggle: toggleImageViewerVisible }] = useBoolean(false);
   const [isGridLoading, { setTrue: gridLoading, setFalse: gridDoneLoading }] = useBoolean(false);
 
-  const { pageSize, filters, carouselHeader, appType } = React.useContext(ConfigContext);
   const [config, updateConfig] = useConfig();
   const isCarousel = appType === AppType.Carousel;
-
-  const filterItems = filters
-    .filter((filter) => filter.filterType === "Vertical")
-    .map((filter) => ({
-      key: filter.verticalName,
-      itemKey: filter.verticalName,
-      text: filter.verticalName,
-      headerText: filter.verticalName,
-      itemProp: buildQuery(filter),
-      isDefault: filter.isDefault,
-    }));
-  const baseQuery = filters
-    .filter((filter) => filter.filterType === "All")
-    .map((filter) => buildQuery(filter))
-    .join(" and ");
 
   const configOptions: IImageServiceOptions = React.useMemo(
     () => ({
       baseQuery: baseQuery,
-      filter: selectedFilter ?? filterItems.find((filter) => filter.isDefault)?.itemProp ?? "",
+      filter: filterQuery,
       disableComments: config.DisableAllComments,
       pageSize,
     }),
-    [config.DisableAllComments, pageSize, selectedFilter, baseQuery]
+    [config.DisableAllComments, pageSize, filterQuery, baseQuery]
   );
 
   React.useEffect(() => {
@@ -97,7 +56,7 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
       setPosts(_posts);
       gridDoneLoading();
     })();
-  }, [configOptions, pageSize]);
+  }, [configOptions]);
 
   return (
     <>
@@ -107,12 +66,12 @@ const ImageGallery = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Elem
         onChangeHeader={onChangeCarouselHeader}
         filterElement={
           <Filters
-            defaultSelectedKey={filterItems.find((f) => f.isDefault)?.key || filterItems[0]?.key || ""}
-            filterItems={filterItems}
-            setSelectedFilter={setSelectedFilter}
+            defaultSelectedKey={defaultFilter?.itemKey || ""}
+            filterItems={filters}
+            setSelectedFilter={setFilterQuery}
           />
         }
-        showFilters={filterItems.length > 0}
+        showFilters={filters.length > 0}
       />
       {!isCarousel && (
         <ImageGrid

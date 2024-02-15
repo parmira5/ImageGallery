@@ -27,6 +27,9 @@ import { PropertyPaneFilterPicker } from "../../propertyPane/PropertyPaneImagePi
 
 import { listService } from "../../services/listService";
 import { IFilter } from "../../models/IFilter";
+import { TDynamicValue } from "../../models/TDynamicValues";
+import { IFilterItem } from "../../models/IFilterItem";
+import { startOfDay } from "date-fns";
 
 export interface IImageGalleryWebPartProps {
   appType: AppType;
@@ -43,8 +46,14 @@ export interface IImageGalleryWebPartProps {
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
   public async render(): Promise<void> {
     if (!this.properties) return;
+    const initialContext = {
+      ...this.properties,
+      filters: this._buildFilterOptions(this.properties.filters),
+      defaultFilter: this._getDefaultFilterOption(this.properties.filters),
+      baseQuery: this._buildBaseQuery(this.properties.filters),
+    };
     const element: React.ReactElement<IImageGalleryProps> = (
-      <ConfigContext.Provider value={this.properties}>
+      <ConfigContext.Provider value={initialContext}>
         <ImageGallery
           onChangeCarouselHeader={this._handleChangeCarouselHeader.bind(this)}
           displayMode={this.displayMode}
@@ -163,5 +172,60 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
   ): void {
     this.properties.carouselHeader = newValue || "";
     this.render();
+  }
+
+  private _buildQuery(filter: IFilter) {
+    if (filter.isNoFilter) return "";
+    if (!filter.filterProperty || !filter.filterValue) return "";
+    let value = filter.filterValue;
+    if (filter.valueType === "Dynamic" && typeof value === "string") {
+      value = this._resolveDynamicValue(value as TDynamicValue);
+    }
+    if (filter.operator === "startsWith" || filter.operator === "contains") {
+      return `${filter.operator}(${filter.filterProperty}, '${value}')`;
+    }
+    return `${filter.filterProperty} ${filter.operator} '${value}'`;
+  }
+
+  private _buildFilterOptions(filters: IFilter[]): IFilterItem[] {
+    if (filters.length === 0) return [];
+    return filters
+      .filter((filter) => filter.filterType === "Vertical")
+      .map((filter) => {
+        return {
+          key: filter.verticalName,
+          itemKey: filter.verticalName,
+          headerText: filter.verticalName,
+          text: filter.verticalName,
+          itemProp: this._buildQuery(filter),
+          isDefault: filter.isDefault,
+        };
+      });
+  }
+
+  private _getDefaultFilterOption(filters: IFilter[]): IFilterItem | null {
+    const filterOptions = this._buildFilterOptions(filters);
+    if (filterOptions.length === 0) return null;
+    const defaultOption = filterOptions.find((opt) => opt.isDefault);
+    if (defaultOption) return defaultOption;
+    return null;
+  }
+
+  private _resolveDynamicValue(valueName: TDynamicValue): string {
+    switch (valueName) {
+      case "USER_EMAIL":
+        return userService.currentUser().email;
+      case "TODAY":
+        return startOfDay(new Date()).toISOString();
+      default:
+        return "";
+    }
+  }
+
+  private _buildBaseQuery(filters: IFilter[]) {
+    return filters
+      .filter((filter) => filter.filterType === "All")
+      .map((filter) => this._buildQuery(filter))
+      .join(" and ");
   }
 }

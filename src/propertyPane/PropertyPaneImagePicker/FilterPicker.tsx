@@ -34,7 +34,6 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
   function handleChangeFilter(filter: IFilter) {
     const idx = findIndex(filters, (_filter) => _filter.id === filter.id);
     let filtersCopy = [...filters];
-    console.log(filter.isDefault);
     if (filter.isDefault) {
       filtersCopy = filtersCopy.map((f) => {
         f.isDefault = false;
@@ -42,7 +41,6 @@ export const FilterPicker = ({ filters, onChange }: IProps) => {
       });
     }
     filtersCopy[idx] = filter;
-    console.log(filtersCopy);
     onChange(filtersCopy);
   }
 
