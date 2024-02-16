@@ -12,7 +12,7 @@ import {
 } from "@fluentui/react";
 import ImageUploading, { ImageListType } from "react-images-uploading";
 import { IPostServerObj } from "../../../models/IPostServerObj";
-import { listService } from "../../../services/listService";
+import { ListService } from "../../../services/listService";
 
 // import styles from "./ImageGalleryForm.module.scss";
 
@@ -21,11 +21,12 @@ export interface IImageGalleryFormProps {
   displayMode: FormDisplayMode;
   onSave: () => void;
   onClose: () => void;
+  listService: ListService;
 }
 
 // const LOG_SOURCE: string = "ImageGalleryForm";
 
-const ImageGalleryForm = ({ context }: IImageGalleryFormProps) => {
+const ImageGalleryForm = ({ context, listService }: IImageGalleryFormProps) => {
   const [post, setPost] = React.useState<Partial<IPostServerObj>>({});
   const [image, setImage] = React.useState<ImageListType>([]);
   const [choiceOptions, setChoiceOptions] = React.useState<IDropdownOption[]>([]);

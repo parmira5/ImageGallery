@@ -1,6 +1,9 @@
 import { ServiceKey, ServiceScope } from "@microsoft/sp-core-library";
 import { SPFI, spfi, SPFx } from "@pnp/sp";
+import "@pnp/sp/webs";
+import "@pnp/sp/lists";
 import "@pnp/sp/site-users";
+import "@pnp/sp/fields";
 import { PageContext } from "@microsoft/sp-page-context";
 import { FieldTypes } from "@pnp/sp/fields";
 import { IPostServerObj } from "../models/IPostServerObj";

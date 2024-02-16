@@ -27,6 +27,7 @@ export default class ImageGalleryFormFormCustomizer extends BaseFormCustomizer<I
 
     const imageGalleryForm: React.ReactElement<{}> = React.createElement(ImageGalleryForm, {
       context: this.context,
+      listService: listService,
       displayMode: this.displayMode,
       onSave: this._onSave,
       onClose: this._onClose,

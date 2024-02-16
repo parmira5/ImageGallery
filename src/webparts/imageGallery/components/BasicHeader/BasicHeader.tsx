@@ -4,6 +4,7 @@ import styles from "./BasicHeader.module.scss";
 import { DisplayMode } from "@microsoft/sp-core-library";
 import { ConfigContext } from "../../../../context/ConfigContext";
 import { submitButtonStyles } from "./fluentui.styles";
+import { Filters } from "../Filters/Filters";
 
 export interface IProps {
   onChangeHeader: (
@@ -12,18 +13,18 @@ export interface IProps {
   ) => void;
   headerText: string;
   displayMode: DisplayMode;
-  filterElement?: JSX.Element;
   showFilters?: boolean;
+  setFilterQuery(value: React.SetStateAction<string | undefined>): void;
 }
 
 export const BasicHeader = ({
   displayMode,
   headerText,
   onChangeHeader,
-  filterElement,
   showFilters = false,
+  setFilterQuery,
 }: IProps): JSX.Element => {
-  const { showSubmit, showSeeAll } = React.useContext(ConfigContext);
+  const { showSubmit, showSeeAll, filters, defaultFilter } = React.useContext(ConfigContext);
   const isEditMode = displayMode === DisplayMode.Edit;
   const showHeader = displayMode === DisplayMode.Read && !!headerText;
   return (
@@ -51,7 +52,15 @@ export const BasicHeader = ({
             <ActionButton styles={submitButtonStyles} key="hi" iconProps={{ iconName: "Add" }} text="Submit a Photo" />
           </div>
         )}
-        {showFilters && filterElement && <div className={styles.pivotContainer}>{filterElement}</div>}
+        {showFilters && (
+          <div className={styles.pivotContainer}>
+            <Filters
+              defaultSelectedKey={defaultFilter?.itemKey || ""}
+              filterItems={filters}
+              setSelectedFilter={setFilterQuery}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

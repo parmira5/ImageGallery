@@ -15,8 +15,8 @@ import { BasicHeader } from "./BasicHeader/BasicHeader";
 import { ImageGrid } from "./ImageGrid/ImageGrid";
 import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
 
-import { Filters } from "./Filters/Filters";
 import { usePosts } from "../../../hooks/usePosts";
+
 interface IProps {
   displayMode: DisplayMode;
   onChangeCarouselHeader: (
@@ -35,15 +35,17 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
 
   const configOptions: IImageServiceOptions = React.useMemo(
     () => ({
-      baseQuery: baseQuery,
       filter: filterQuery,
       disableComments: commentsDisabled,
+      baseQuery,
       pageSize,
     }),
     [commentsDisabled, pageSize, filterQuery, baseQuery]
   );
 
-  const { getNextPage, hasNext, isLoading, posts, isNextLoading } = usePosts(configOptions);
+  const { getNextPage, hasNext, isLoading, posts, isNextLoading, error } = usePosts(configOptions);
+
+  console.log(error);
 
   const isCarousel = appType === AppType.Carousel;
 
@@ -53,14 +55,8 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
         displayMode={displayMode}
         headerText={carouselHeader}
         onChangeHeader={onChangeCarouselHeader}
-        filterElement={
-          <Filters
-            defaultSelectedKey={defaultFilter?.itemKey || ""}
-            filterItems={filters}
-            setSelectedFilter={setFilterQuery}
-          />
-        }
         showFilters={filters.length > 0}
+        setFilterQuery={setFilterQuery}
       />
       {!isCarousel && (
         <ImageGrid
