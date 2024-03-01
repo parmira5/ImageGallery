@@ -5,13 +5,12 @@ import { chatIconStyles, textStyles } from "./fluentui.styles";
 
 interface IImageOverlay {
   id: number;
-  title: string;
   description: string;
   commentCount: number;
   fontVariation: keyof IFontStyles;
 }
 
-export const ImageOverlay = ({ description, title, id, commentCount, fontVariation }: IImageOverlay): JSX.Element => {
+export const ImageOverlay = ({ description, commentCount, fontVariation }: IImageOverlay): JSX.Element => {
   return (
     <div className={styles.imageOverlay}>
       {commentCount > 0 ? (

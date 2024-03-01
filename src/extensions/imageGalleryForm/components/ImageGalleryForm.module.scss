@@ -3,3 +3,13 @@
   color: "[theme:themePrimary, default:#0078d4]";
   padding: 0.5rem;
 }
+
+.commandBarItems {
+  height: 32px;
+}
+
+.image { 
+  height: 100%; 
+  max-height: 225px; 
+  object-fit: contain;
+}

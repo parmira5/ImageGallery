@@ -8,6 +8,7 @@ import { PageContext } from "@microsoft/sp-page-context";
 import { FieldTypes } from "@pnp/sp/fields";
 import { IPostServerObj } from "../models/IPostServerObj";
 import { IDropdownOption } from "@fluentui/react";
+import { configService } from "./configService";
 
 export class ListService {
   public static readonly serviceKey: ServiceKey<ListService> = ServiceKey.create<ListService>(
@@ -20,7 +21,7 @@ export class ListService {
   public init(serviceScope: ServiceScope): void {
     serviceScope.whenFinished(() => {
       this._pageContext = serviceScope.consume(PageContext.serviceKey);
-      this._sp = spfi().using(SPFx({ pageContext: this._pageContext }));
+      this._sp = spfi(configService.sourceSitePath).using(SPFx({ pageContext: this._pageContext }));
     });
   }
 
@@ -34,7 +35,7 @@ export class ListService {
       "Title",
     ];
     const res = await this._sp.web.lists
-      .getByTitle(listName)
+      .getById(configService.galleryId)
       .fields.filter(fieldsOfInterest.map((field) => `(StaticName eq '${field}')`).join(" or "))();
 
     return res.map((field) => {
@@ -46,8 +47,8 @@ export class ListService {
     });
   }
 
-  public async getCategoryOptions(listName: string): Promise<IDropdownOption[]> {
-    const field = await this._sp.web.lists.getByTitle(listName).fields.getByTitle("ImageCategory")();
+  public async getCategoryOptions(): Promise<IDropdownOption[]> {
+    const field = await this._sp.web.lists.getById(configService.galleryId).fields.getByTitle("ImageCategory")();
     return field.Choices?.map((choice) => ({ key: choice, text: choice })) || [];
   }
 }

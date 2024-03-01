@@ -4,6 +4,7 @@ import "@pnp/sp/site-users";
 import { SPHttpClient } from "@microsoft/sp-http-base";
 import { PageContext, SPUser } from "@microsoft/sp-page-context";
 import { PermissionKind } from "@pnp/sp/security";
+import { configService } from "./configService";
 
 export class UserService {
   public static readonly serviceKey: ServiceKey<UserService> = ServiceKey.create<UserService>(
@@ -19,7 +20,7 @@ export class UserService {
     serviceScope.whenFinished(() => {
       this._pageContext = serviceScope.consume(PageContext.serviceKey);
       this._currentUser = this._pageContext.user;
-      this._sp = spfi().using(SPFx({ pageContext: this._pageContext }));
+      this._sp = spfi(configService.sitePath).using(SPFx({ pageContext: this._pageContext }));
     });
   }
 
@@ -28,15 +29,17 @@ export class UserService {
   }
 
   public async currentUserHasAddPemissionsOnImageList(): Promise<boolean> {
-    return await this._sp.web.lists.getByTitle("Image Gallery").currentUserHasPermissions(PermissionKind.AddListItems);
+    return await this._sp.web.lists
+      .getById(configService.galleryId)
+      .currentUserHasPermissions(PermissionKind.AddListItems);
   }
 
   public async currentUserHasFullControlOnImageList(): Promise<boolean> {
     const [hasAdd, hasEdit, hasView, hasDelete] = await Promise.all([
-      this._sp.web.lists.getByTitle("Image Gallery").currentUserHasPermissions(PermissionKind.AddListItems),
-      this._sp.web.lists.getByTitle("Image Gallery").currentUserHasPermissions(PermissionKind.EditListItems),
-      this._sp.web.lists.getByTitle("Image Gallery").currentUserHasPermissions(PermissionKind.DeleteListItems),
-      this._sp.web.lists.getByTitle("Image Gallery").currentUserHasPermissions(PermissionKind.ViewListItems),
+      this._sp.web.lists.getById(configService.galleryId).currentUserHasPermissions(PermissionKind.AddListItems),
+      this._sp.web.lists.getById(configService.galleryId).currentUserHasPermissions(PermissionKind.EditListItems),
+      this._sp.web.lists.getById(configService.galleryId).currentUserHasPermissions(PermissionKind.DeleteListItems),
+      this._sp.web.lists.getById(configService.galleryId).currentUserHasPermissions(PermissionKind.ViewListItems),
     ]);
     return hasAdd && hasEdit && hasView && hasDelete;
   }

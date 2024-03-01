@@ -6,23 +6,30 @@ import styles from "./TaggedUsers.module.scss";
 import { textBoxStyles } from "./fluentui.styles";
 
 interface IProps {
-  users: Partial<IListUser>[];
+  users: Partial<IListUser>[] | string[];
   maxDisplayablePersonas: number;
 }
 
 export const TaggedUsers = ({ users, maxDisplayablePersonas }: IProps): JSX.Element => {
   const [isCalloutVisible, { toggle: toggleIsCalloutVisible }] = useBoolean(false);
 
-  const facepileItems: IFacepilePersona[] = users.slice(0, maxDisplayablePersonas).map((user) => ({
-    imageInitials: `${user.FirstName?.[0]}${user.LastName?.[0]}`,
-    personaName: `${user.FirstName} ${user.LastName}`,
-  }));
+  const facepileItems: IFacepilePersona[] = users.slice(0, maxDisplayablePersonas).map((user) => {
+    if (typeof user !== "string") {
+      return {
+        imageInitials: `${user.FirstName?.[0]}${user.LastName?.[0]}`,
+        personaName: `${user.FirstName} ${user.LastName}`,
+      };
+    } else
+      return {
+        personName: user,
+      };
+  });
   const overFlow = users.slice(maxDisplayablePersonas, users.length);
 
   return (
     <div className={styles.taggedUsers}>
       <Text variant="small" as={"span"}>
-        Tagged
+        With
       </Text>
       <Facepile
         styles={{ root: { display: "inline" } }}
@@ -50,7 +57,7 @@ export const TaggedUsers = ({ users, maxDisplayablePersonas }: IProps): JSX.Elem
             >
               {overFlow.map((user, i) => (
                 <Text key={i} variant="xSmall">
-                  {user.FirstName} {user.LastName}
+                  {typeof user !== "string" ? `${user.FirstName} ${user.LastName}` : user}
                 </Text>
               ))}
             </Callout>

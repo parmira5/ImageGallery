@@ -13,5 +13,5 @@ export interface IPostServerObj {
   Created: string;
   ImageWidth: number;
   ImageHeight: number;
-  TaggedUsers: Partial<IListUser>[];
+  TaggedUsers: Partial<IListUser>[] | string[];
 }

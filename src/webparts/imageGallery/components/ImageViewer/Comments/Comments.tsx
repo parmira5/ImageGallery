@@ -15,14 +15,13 @@ import {
 import { useBoolean } from "@fluentui/react-hooks";
 import { personStyles, textFieldStyles } from "./fluentui.styles";
 
-import { TextEntry } from "./TextEntry";
+import { Comment } from "./Comment";
 
-import { Post } from "../../../../models/Post";
-import { commentService } from "../../../../services/commenService";
-import { userService } from "../../../../services/userService";
+import { Post } from "../../../../../models/Post";
+import { commentService } from "../../../../../services/commentService";
+import { userService } from "../../../../../services/userService";
 import { CollapsibleInput } from "../CollapsibleInput/CollapsibleInput";
-import { CommentObj } from "../../../../models/CommentObj";
-import { TaggedUsers } from "../TaggedUsers/TaggedUsers";
+import { useComments } from "../../../../../hooks/useComments";
 
 interface IComments {
   image: Post;
@@ -32,33 +31,15 @@ interface IComments {
 export const Comments = React.forwardRef(
   ({ image, hideTags }: IComments, ref: React.RefObject<HTMLElement>): JSX.Element => {
     const [commentText, setCommentText] = React.useState("");
-    const [comments, setComments] = React.useState<CommentObj[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true);
+
+    const { comments, getNextPage, hasNext, isLoading, postComment } = useComments(image.id);
     const [isInputOpen, { setTrue: openInput, setFalse: closeInput }] = useBoolean(false);
     const windowSize = useWindowSize();
-    const isMobileLayout = windowSize.width < 1281;
 
-    React.useEffect(() => {
-      (async () => {
-        setIsLoading(true);
-        await fetchComments();
-        setIsLoading(false);
-      })();
-    }, []);
+    const isMobileLayout = windowSize.width < 1281;
 
     return (
       <section className={styles.comments}>
-        <section className={styles.imageDescriptionWrapper}>
-          <TextEntry
-            authorEmail={image.authorEmail}
-            authorName={image.authorName}
-            createdDate={image.createdDate}
-            text={image.description}
-          />
-          {!!image.taggedUsers.length && !hideTags && (
-            <TaggedUsers users={image.taggedUsers} maxDisplayablePersonas={3} />
-          )}
-        </section>
         <section className={styles.commentsListWrapper}>
           <div className={styles.mobileInputWrapper}>
             <CollapsibleInput
@@ -67,7 +48,7 @@ export const Comments = React.forwardRef(
               onClickExpand={openInput}
               onSave={handleSubmit}
               value={commentText}
-              onChangeInput={handleChange}
+              onChangeInput={handleChangeInput}
               expandButtonText="Write a Comment"
               placeHolder="Enter a Comment"
             />
@@ -83,7 +64,7 @@ export const Comments = React.forwardRef(
               getScrollParent={isMobileLayout ? () => ref.current : undefined}
             >
               {comments.map((comment) => (
-                <TextEntry
+                <Comment
                   key={comment.id}
                   authorEmail={comment.authorEmail}
                   authorName={comment.authorName}
@@ -97,7 +78,7 @@ export const Comments = React.forwardRef(
         <section className={styles.inputWrapper}>
           <Persona size={PersonaSize.size24} styles={personStyles} imageUrl={userService.getCurrentUserPhoto()} />
           <TextField
-            onChange={handleChange}
+            onChange={handleChangeInput}
             styles={textFieldStyles}
             value={commentText}
             placeholder="Enter a comment"
@@ -108,7 +89,7 @@ export const Comments = React.forwardRef(
       </section>
     );
 
-    function handleChange(
+    function handleChangeInput(
       event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
       newValue?: string | undefined
     ): void {
@@ -118,38 +99,22 @@ export const Comments = React.forwardRef(
     }
 
     async function handleInfiniteScroll(): Promise<void> {
-      try {
-        if (commentService.hasNext) {
-          const nextPage = await commentService.getNext();
-          setComments((prev) => [...prev, ...nextPage]);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+      if (hasNext) getNextPage();
     }
 
     async function handleSubmit(): Promise<void> {
-      if (commentText) {
-        commentService.postComment(image.id, commentText).then(fetchComments).catch(console.error);
+      if (commentText && image.id) {
+        postComment(commentText);
         closeInput();
         setCommentText("");
       }
     }
 
     async function handleKeyUp(e: React.KeyboardEvent): Promise<void> {
-      if (e.key === "Enter" && commentText) {
-        commentService.postComment(image.id, commentText).then(fetchComments).catch(console.error);
+      if (e.key === "Enter" && commentText && image.id) {
+        postComment(commentText);
         closeInput();
         setCommentText("");
-      }
-    }
-
-    async function fetchComments(): Promise<void> {
-      try {
-        const res = await commentService.getComments(image.id);
-        setComments(res);
-      } catch (error) {
-        console.error(error);
       }
     }
 

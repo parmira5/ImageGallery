@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IImageServiceOptions, imageService } from "../services/imageService";
+import { IPostServiceOptions, postService } from "../services/postService";
 import { Post } from "../models/Post";
 
 type TUserPost = {
@@ -11,7 +11,7 @@ type TUserPost = {
   error: string;
 };
 
-export const usePosts = (configOptions: IImageServiceOptions): TUserPost => {
+export const usePosts = (configOptions: IPostServiceOptions): TUserPost => {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -20,11 +20,11 @@ export const usePosts = (configOptions: IImageServiceOptions): TUserPost => {
 
   React.useEffect(() => {
     setIsLoading(true);
-    imageService
+    postService
       .getAllPosts(configOptions)
       .then((res) => {
         setPosts(res);
-        setHasNext(imageService.hasNext);
+        setHasNext(postService.hasNext);
         setIsLoading(false);
       })
       .catch((e) => {
@@ -36,10 +36,10 @@ export const usePosts = (configOptions: IImageServiceOptions): TUserPost => {
   async function getNextPage(): Promise<void> {
     try {
       setIsNextLoading(true);
-      const nextSet = await imageService.getNext(configOptions);
+      const nextSet = await postService.getNext(configOptions);
       if (nextSet) {
         setPosts((prev) => [...prev, ...nextSet]);
-        setHasNext(imageService.hasNext);
+        setHasNext(postService.hasNext);
         setIsNextLoading(false);
       }
     } catch (error) {

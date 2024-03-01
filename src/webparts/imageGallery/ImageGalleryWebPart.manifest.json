@@ -26,6 +26,11 @@
       },
       "officeFabricIconFontName": "Page",
       "properties": {
+        "libraryId": "",
+        "libraryPath": "",
+        "configListId": "",
+        "sourceSiteId": "",
+        "setupError": "",
         "carouselHeader": "",
         "appType": 2,
         "columnCount": 3,

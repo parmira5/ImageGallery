@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Post } from "../../../models/Post";
 
-import { IImageServiceOptions } from "../../../services/imageService";
+import { IPostServiceOptions } from "../../../services/postService";
 
 import { useBoolean } from "@fluentui/react-hooks";
 
@@ -16,6 +16,7 @@ import { ImageGrid } from "./ImageGrid/ImageGrid";
 import { ImageCarousel } from "./ImageCarousel/ImageCarousel";
 
 import { usePosts } from "../../../hooks/usePosts";
+import Form from "./NewForm/Form";
 
 interface IProps {
   displayMode: DisplayMode;
@@ -30,10 +31,11 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
     React.useContext(ConfigContext);
 
   const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
-  const [filterQuery, setFilterQuery] = React.useState(defaultFilter?.itemProp || undefined);
+  const [filterQuery, setFilterQuery] = React.useState(defaultFilter?.itemProp);
   const [isImageViewerVisible, { toggle: toggleImageViewerVisible }] = useBoolean(false);
+  const [isNewFormVisible, { toggle: toggleNewFormVisible }] = useBoolean(false);
 
-  const configOptions: IImageServiceOptions = React.useMemo(
+  const configOptions: IPostServiceOptions = React.useMemo(
     () => ({
       filter: filterQuery,
       disableComments: commentsDisabled,
@@ -43,9 +45,7 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
     [commentsDisabled, pageSize, filterQuery, baseQuery]
   );
 
-  const { getNextPage, hasNext, isLoading, posts, isNextLoading, error } = usePosts(configOptions);
-
-  console.log(error);
+  const { getNextPage, hasNext, isLoading, posts, isNextLoading } = usePosts(configOptions);
 
   const isCarousel = appType === AppType.Carousel;
 
@@ -57,7 +57,9 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
         onChangeHeader={onChangeCarouselHeader}
         showFilters={filters.length > 0}
         setFilterQuery={setFilterQuery}
+        onClickSubmitPhoto={toggleNewFormVisible}
       />
+      {isCarousel && <ImageCarousel onClickItem={handleClickImage} posts={posts} />}
       {!isCarousel && (
         <ImageGrid
           posts={posts}
@@ -68,7 +70,6 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
           isNextPageLoading={isNextLoading}
         />
       )}
-      {isCarousel && <ImageCarousel onClickItem={handleClickImage} posts={posts} />}
       <ImageViewer
         isOpen={isImageViewerVisible}
         onDismiss={toggleImageViewerVisible}
@@ -76,6 +77,7 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
         hideComments={commentsDisabled}
         hideTags={taggingDisabled}
       />
+      <Form isOpen={isNewFormVisible} onDismiss={toggleNewFormVisible} />
     </>
   );
 

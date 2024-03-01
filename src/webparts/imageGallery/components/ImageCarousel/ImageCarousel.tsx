@@ -15,19 +15,21 @@ export const ImageCarousel = ({ posts, onClickItem }: IProps): JSX.Element => {
   return (
     <div className={styles.imageCarouselWrapper}>
       <div className={styles.imageCarousel} ref={ref as React.LegacyRef<HTMLDivElement> | undefined} {...events}>
-        {posts.map((post) => (
-          <div key={post.id} className={styles.imageCardWrapper}>
-            <ImageCard key={post.id} onClick={onClickItem} id={post.id} post={post}>
-              <ImageOverlay
-                id={post.id}
-                description={post.description}
-                title={post.title}
-                commentCount={post.comments.commentCount}
-                fontVariation="small"
-              />
-            </ImageCard>
-          </div>
-        ))}
+        {posts.map((post) => {
+          if (post.id)
+            return (
+              <div key={post.id} className={styles.imageCardWrapper}>
+                <ImageCard key={post.id} onClick={onClickItem} id={post.id} post={post}>
+                  <ImageOverlay
+                    id={post.id}
+                    description={post.description}
+                    commentCount={post.comments.commentCount}
+                    fontVariation="small"
+                  />
+                </ImageCard>
+              </div>
+            );
+        })}
       </div>
     </div>
   );

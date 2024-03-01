@@ -5,6 +5,9 @@ import { BaseFormCustomizer } from "@microsoft/sp-listview-extensibility";
 
 import ImageGalleryForm, { IImageGalleryFormProps } from "./components/ImageGalleryForm";
 import { listService } from "../../services/listService";
+import { Post } from "../../models/Post";
+import { postService } from "../../services/postService";
+import { FormDisplayMode } from "@microsoft/sp-core-library";
 
 /**
  * If your form customizer uses the ClientSideComponentProperties JSON input,
@@ -17,22 +20,35 @@ export interface IImageGalleryFormFormCustomizerProperties {
 }
 
 export default class ImageGalleryFormFormCustomizer extends BaseFormCustomizer<IImageGalleryFormFormCustomizerProperties> {
-  public onInit(): Promise<void> {
+  private _post = new Post();
+  public async onInit(): Promise<void> {
     listService.init(this.context.serviceScope);
-    return Promise.resolve();
+    postService.init(this.context.serviceScope, this.context.spHttpClient);
+    if (this.displayMode !== FormDisplayMode.New && this.context.itemId) {
+      try {
+        const post = await postService.getSinglePost(this.context.itemId);
+        console.log("post right after call", post);
+        if (post) {
+          this._post = post;
+          console.log("post after", post);
+        }
+        return Promise.resolve();
+      } catch (error) {
+        console.log("error");
+        return Promise.resolve();
+      }
+    }
   }
 
   public render(): void {
     // Use this method to perform your custom rendering.
-
     const imageGalleryForm: React.ReactElement<{}> = React.createElement(ImageGalleryForm, {
       context: this.context,
-      listService: listService,
       displayMode: this.displayMode,
       onSave: this._onSave,
       onClose: this._onClose,
+      item: this._post,
     } as IImageGalleryFormProps);
-
     ReactDOM.render(imageGalleryForm, this.domElement);
   }
 
@@ -42,8 +58,8 @@ export default class ImageGalleryFormFormCustomizer extends BaseFormCustomizer<I
     super.onDispose();
   }
 
-  private _onSave = (): void => {
-    // You MUST call this.formSaved() after you save the form.
+  private _onSave = async (post: Post, fileContent: File): Promise<void> => {
+    await postService.createPost(post, fileContent);
     this.formSaved();
   };
 

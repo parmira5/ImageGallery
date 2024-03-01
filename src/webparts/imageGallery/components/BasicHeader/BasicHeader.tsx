@@ -15,6 +15,7 @@ export interface IProps {
   displayMode: DisplayMode;
   showFilters?: boolean;
   setFilterQuery(value: React.SetStateAction<string | undefined>): void;
+  onClickSubmitPhoto: () => void;
 }
 
 export const BasicHeader = ({
@@ -23,6 +24,7 @@ export const BasicHeader = ({
   onChangeHeader,
   showFilters = false,
   setFilterQuery,
+  onClickSubmitPhoto,
 }: IProps): JSX.Element => {
   const { showSubmit, showSeeAll, filters, defaultFilter } = React.useContext(ConfigContext);
   const isEditMode = displayMode === DisplayMode.Edit;
@@ -49,7 +51,13 @@ export const BasicHeader = ({
       <div className={styles.bottomRow}>
         {showSubmit && (
           <div className={`${showFilters ? styles.absolute + " " : ""}${styles.buttonContainer}`}>
-            <ActionButton styles={submitButtonStyles} key="hi" iconProps={{ iconName: "Add" }} text="Submit a Photo" />
+            <ActionButton
+              onClick={onClickSubmitPhoto}
+              styles={submitButtonStyles}
+              key="hi"
+              iconProps={{ iconName: "Add" }}
+              text="Submit a Photo"
+            />
           </div>
         )}
         {showFilters && (

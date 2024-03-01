@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
-import { Version } from "@microsoft/sp-core-library";
+import { DisplayMode, Version } from "@microsoft/sp-core-library";
 import {
   type IPropertyPaneConfiguration,
   PropertyPaneChoiceGroup,
@@ -14,10 +14,10 @@ import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
 
 import App from "./components/App";
 
-import { imageService } from "../../services/imageService";
+import { postService } from "../../services/postService";
 import { userService } from "../../services/userService";
 import { configService } from "../../services/configService";
-import { commentService } from "../../services/commenService";
+import { commentService } from "../../services/commentService";
 import { IReadonlyTheme } from "@microsoft/sp-component-base";
 import { ConfigContext } from "../../context/ConfigContext";
 import { AppType } from "../../models/AppType";
@@ -30,8 +30,13 @@ import { IFilter } from "../../models/IFilter";
 import { TDynamicValue } from "../../models/TDynamicValues";
 import { IFilterItem } from "../../models/IFilterItem";
 import { startOfDay } from "date-fns";
+import { setupService } from "../../services/setupService";
 
 export interface IImageGalleryWebPartProps {
+  libraryId: string;
+  libraryPath: string;
+  configListId: string;
+  sourceSiteId: string;
   appType: AppType;
   carouselHeader: string;
   columnCount: ColumnCount;
@@ -43,18 +48,35 @@ export interface IImageGalleryWebPartProps {
   filterType: FilterType;
   commentsDisabled: boolean;
   taggingDisabled: boolean;
+  setupError: string;
 }
 
 export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGalleryWebPartProps> {
   public async render(): Promise<void> {
+    let element: React.ReactElement;
     if (!this.properties) return;
+    if (this._isUnconfigured() && this.displayMode === DisplayMode.Read) {
+      element = <div>Setup Required. Please edit the page to proceed.</div>;
+    }
+    if (this.properties.setupError) {
+      if (this.displayMode === DisplayMode.Edit) {
+        element = (
+          <div>
+            Error: {this.properties.setupError}
+            <button onClick={this._retrySetup.bind(this)}>Try Again</button>
+          </div>
+        );
+      } else {
+        element = <div>Setup Required. Please edit the page to proceed.</div>;
+      }
+    }
     const initialContext = {
       ...this.properties,
       filters: this._buildFilterOptions(this.properties.filters),
       defaultFilter: this._getDefaultFilterOption(this.properties.filters),
       baseQuery: this._buildBaseQuery(this.properties.filters),
     };
-    const element: React.ReactElement<{}> = (
+    element = (
       <ConfigContext.Provider value={initialContext}>
         <App onChangeCarouselHeader={this._handleChangeCarouselHeader.bind(this)} displayMode={this.displayMode} />
       </ConfigContext.Provider>
@@ -62,10 +84,14 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
     ReactDom.render(element, this.domElement);
   }
 
-  protected onInit(): Promise<void> {
-    configService.init(this.context.serviceScope, this.context.spHttpClient);
+  protected async onInit(): Promise<void> {
+    await setupService.init(this.context.serviceScope);
+    if (this._isUnconfigured()) {
+      await this._setListProperties();
+    }
+    configService.init(this.context.serviceScope, this.context.spHttpClient, this.properties);
     listService.init(this.context.serviceScope);
-    imageService.init(this.context.serviceScope, this.context.spHttpClient);
+    postService.init(this.context.serviceScope, this.context.spHttpClient);
     commentService.init(this.context.serviceScope, this.context.spHttpClient);
     userService.init(this.context.serviceScope, this.context.spHttpClient);
     return super.onInit();
@@ -261,5 +287,31 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
       .filter((filter) => filter.filterType === "All")
       .map((filter) => this._buildQuery(filter))
       .join(" and ");
+  }
+
+  private _isUnconfigured() {
+    return !this.properties.configListId || !this.properties.libraryId;
+  }
+
+  private async _setListProperties() {
+    try {
+      const lib = await setupService.findGalleryLib();
+      console.log("lib", lib);
+      this.properties.libraryId = lib.ListId as string;
+      this.properties.libraryPath = lib.Path as string;
+      this.properties.sourceSiteId = (lib as any).SiteName as string;
+      this.properties.configListId = (await setupService.findConfigList()).ListId as string;
+      this.properties.setupError = "";
+      console.log(this.properties);
+      this.render();
+    } catch (error) {
+      this.properties.setupError = error.message;
+      this.render();
+    }
+  }
+
+  private async _retrySetup() {
+    this._setListProperties();
+    this.render();
   }
 }
