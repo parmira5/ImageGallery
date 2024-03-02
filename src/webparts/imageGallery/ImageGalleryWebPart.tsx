@@ -296,7 +296,6 @@ export default class ImageGalleryWebPart extends BaseClientSideWebPart<IImageGal
   private async _setListProperties() {
     try {
       const lib = await setupService.findGalleryLib();
-      console.log("lib", lib);
       this.properties.libraryId = lib.ListId as string;
       this.properties.libraryPath = lib.Path as string;
       this.properties.sourceSiteId = (lib as any).SiteName as string;

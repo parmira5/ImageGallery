@@ -13,13 +13,21 @@ interface IProps {
   createdDate: string;
   description: string;
   taggedUsers: any[];
+  separator?: boolean;
 }
 
-export const ImageDescription = ({ authorEmail, authorName, createdDate, description, taggedUsers }: IProps) => {
+export const ImageDescription = ({
+  authorEmail,
+  authorName,
+  createdDate,
+  description,
+  taggedUsers,
+  separator = false,
+}: IProps) => {
   const { taggingDisabled } = React.useContext(ConfigContext);
   const imageUrl = userService.getUserPhotoByEmail(authorEmail, "S");
   return (
-    <section className={styles.imageDescriptionWrapper}>
+    <section className={`${styles.imageDescriptionWrapper}${separator ? ` ${styles.separator}` : ""}`}>
       <Stack horizontal horizontalAlign="start">
         <Persona
           imageUrl={imageUrl}

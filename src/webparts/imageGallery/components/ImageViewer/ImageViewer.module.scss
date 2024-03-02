@@ -18,6 +18,7 @@
   min-width: 0;
   margin: 30px auto;
   overscroll-behavior-y: none;
+  position: relative;
 }
 
 .commentsWrapper {
@@ -34,6 +35,9 @@
   flex-direction: column;
   gap: 1em;
   padding-bottom: 12px;
+}
+
+.separator {
   border-bottom-width: 1px;
   border-bottom-style: solid;
   border-bottom-color: "[theme:neutralLighter, default:#f4f4f4]"
@@ -57,7 +61,6 @@
   .fullSizeImage {
     object-fit: cover;
     margin: auto;
-    max-height: 60%;
   }
 
 }

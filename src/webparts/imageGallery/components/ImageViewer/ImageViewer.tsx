@@ -23,13 +23,26 @@ export const ImageViewer = ({
   return (
     <Panel {...props} styles={panelStyles} type={PanelType.custom} customWidth="100%" allowTouchBodyScroll>
       <section ref={postWrapperRef} className={styles.postWrapper}>
-        <img
-          className={styles.fullSizeImage}
-          src={selectedPost.imagePath}
-          alt="todo" //TODO
-          width={selectedPost.imageWidth}
-          height={selectedPost.imageHeight}
-        />
+        <div style={{ position: "relative" }}>
+          {hideComments && (
+            <div style={{ position: "absolute", bottom: 5, left: 0, right: 0 }}>
+              <ImageDescription
+                authorEmail={selectedPost.authorEmail}
+                authorName={selectedPost.authorName}
+                createdDate={selectedPost.createdDate}
+                description={selectedPost.description}
+                taggedUsers={selectedPost.taggedUsers}
+              />
+            </div>
+          )}
+          <img
+            className={styles.fullSizeImage}
+            src={selectedPost.imagePath}
+            alt="todo" //TODO
+            width={selectedPost.imageWidth}
+            height={selectedPost.imageHeight}
+          />
+        </div>
         {!hideComments && (
           <div className={styles.commentsWrapper}>
             <ImageDescription
@@ -38,6 +51,7 @@ export const ImageViewer = ({
               createdDate={selectedPost.createdDate}
               description={selectedPost.description}
               taggedUsers={selectedPost.taggedUsers}
+              separator
             />
             <Comments ref={postWrapperRef} image={selectedPost} hideTags={hideTags} />
           </div>
