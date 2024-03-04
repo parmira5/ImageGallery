@@ -25,105 +25,102 @@ import { useComments } from "../../../../../hooks/useComments";
 
 interface IComments {
   image: Post;
-  hideTags: boolean;
 }
 
-export const Comments = React.forwardRef(
-  ({ image, hideTags }: IComments, ref: React.RefObject<HTMLElement>): JSX.Element => {
-    const [commentText, setCommentText] = React.useState("");
+export const Comments = React.forwardRef(({ image }: IComments, ref: React.RefObject<HTMLElement>): JSX.Element => {
+  const [commentText, setCommentText] = React.useState("");
 
-    const { comments, getNextPage, hasNext, isLoading, postComment } = useComments(image.id);
-    const [isInputOpen, { setTrue: openInput, setFalse: closeInput }] = useBoolean(false);
-    const windowSize = useWindowSize();
+  const { comments, getNextPage, hasNext, isLoading, postComment } = useComments(image.id);
+  const [isInputOpen, { setTrue: openInput, setFalse: closeInput }] = useBoolean(false);
+  const windowSize = useWindowSize();
 
-    const isMobileLayout = windowSize.width < 1281;
+  const isMobileLayout = windowSize.width < 1281;
 
-    return (
-      <section className={styles.comments}>
-        <section className={styles.commentsListWrapper}>
-          <div className={styles.mobileInputWrapper}>
-            <CollapsibleInput
-              isOpen={isInputOpen}
-              onCancel={handleCollapseInput}
-              onClickExpand={openInput}
-              onSave={handleSubmit}
-              value={commentText}
-              onChangeInput={handleChangeInput}
-              expandButtonText="Write a Comment"
-              placeHolder="Enter a Comment"
-            />
-          </div>
-          {isLoading && <CommentsShimmer />}
-          {!isLoading && (
-            <InfiniteScroll
-              pageStart={0}
-              className={styles.commentList}
-              loadMore={handleInfiniteScroll}
-              hasMore={commentService.hasNext}
-              useWindow={false}
-              getScrollParent={isMobileLayout ? () => ref.current : undefined}
-            >
-              {comments.map((comment) => (
-                <Comment
-                  key={comment.id}
-                  authorEmail={comment.authorEmail}
-                  authorName={comment.authorName}
-                  createdDate={comment.createdDate}
-                  text={comment.text}
-                />
-              ))}
-            </InfiniteScroll>
-          )}
-        </section>
-        <section className={styles.inputWrapper}>
-          <Persona size={PersonaSize.size24} styles={personStyles} imageUrl={userService.getCurrentUserPhoto()} />
-          <TextField
-            onChange={handleChangeInput}
-            styles={textFieldStyles}
+  return (
+    <section className={styles.comments}>
+      <section className={styles.commentsListWrapper}>
+        <div className={styles.mobileInputWrapper}>
+          <CollapsibleInput
+            isOpen={isInputOpen}
+            onCancel={handleCollapseInput}
+            onClickExpand={openInput}
+            onSave={handleSubmit}
             value={commentText}
-            placeholder="Enter a comment"
-            onKeyUp={handleKeyUp}
+            onChangeInput={handleChangeInput}
+            expandButtonText="Write a Comment"
+            placeHolder="Enter a Comment"
           />
-          <ActionButton onClick={handleSubmit} iconProps={{ iconName: "Send" }} />
-        </section>
+        </div>
+        {isLoading && <CommentsShimmer />}
+        {!isLoading && (
+          <InfiniteScroll
+            pageStart={0}
+            className={styles.commentList}
+            loadMore={handleInfiniteScroll}
+            hasMore={commentService.hasNext}
+            useWindow={false}
+            getScrollParent={isMobileLayout ? () => ref.current : undefined}
+          >
+            {comments.map((comment) => (
+              <Comment
+                key={comment.id}
+                authorEmail={comment.authorEmail}
+                authorName={comment.authorName}
+                createdDate={comment.createdDate}
+                text={comment.text}
+              />
+            ))}
+          </InfiniteScroll>
+        )}
       </section>
-    );
+      <section className={styles.inputWrapper}>
+        <Persona size={PersonaSize.size24} styles={personStyles} imageUrl={userService.getCurrentUserPhoto()} />
+        <TextField
+          onChange={handleChangeInput}
+          styles={textFieldStyles}
+          value={commentText}
+          placeholder="Enter a comment"
+          onKeyUp={handleKeyUp}
+        />
+        <ActionButton onClick={handleSubmit} iconProps={{ iconName: "Send" }} />
+      </section>
+    </section>
+  );
 
-    function handleChangeInput(
-      event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-      newValue?: string | undefined
-    ): void {
-      if (newValue || newValue === "") {
-        setCommentText(newValue);
-      }
+  function handleChangeInput(
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ): void {
+    if (newValue || newValue === "") {
+      setCommentText(newValue);
     }
+  }
 
-    async function handleInfiniteScroll(): Promise<void> {
-      if (hasNext) getNextPage();
-    }
+  async function handleInfiniteScroll(): Promise<void> {
+    if (hasNext) getNextPage();
+  }
 
-    async function handleSubmit(): Promise<void> {
-      if (commentText && image.id) {
-        postComment(commentText);
-        closeInput();
-        setCommentText("");
-      }
-    }
-
-    async function handleKeyUp(e: React.KeyboardEvent): Promise<void> {
-      if (e.key === "Enter" && commentText && image.id) {
-        postComment(commentText);
-        closeInput();
-        setCommentText("");
-      }
-    }
-
-    function handleCollapseInput(): void {
+  async function handleSubmit(): Promise<void> {
+    if (commentText && image.id) {
+      postComment(commentText);
       closeInput();
       setCommentText("");
     }
   }
-);
+
+  async function handleKeyUp(e: React.KeyboardEvent): Promise<void> {
+    if (e.key === "Enter" && commentText && image.id) {
+      postComment(commentText);
+      closeInput();
+      setCommentText("");
+    }
+  }
+
+  function handleCollapseInput(): void {
+    closeInput();
+    setCommentText("");
+  }
+});
 
 function CommentsShimmer(): JSX.Element {
   const wrapperStyles = { display: "flex" };

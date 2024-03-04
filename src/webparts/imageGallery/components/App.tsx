@@ -27,7 +27,7 @@ interface IProps {
 }
 
 const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
-  const { pageSize, filters, carouselHeader, appType, baseQuery, defaultFilter, commentsDisabled, taggingDisabled } =
+  const { pageSize, filters, carouselHeader, appType, baseQuery, defaultFilter, commentsDisabled } =
     React.useContext(ConfigContext);
 
   const [selectedPost, setSelectedPost] = React.useState<Post>(new Post());
@@ -70,13 +70,7 @@ const App = ({ onChangeCarouselHeader, displayMode }: IProps): JSX.Element => {
           isNextPageLoading={isNextLoading}
         />
       )}
-      <ImageViewer
-        isOpen={isImageViewerVisible}
-        onDismiss={toggleImageViewerVisible}
-        selectedPost={selectedPost}
-        hideComments={commentsDisabled}
-        hideTags={taggingDisabled}
-      />
+      <ImageViewer isOpen={isImageViewerVisible} onDismiss={toggleImageViewerVisible} selectedPost={selectedPost} />
       <Form isOpen={isNewFormVisible} onDismiss={toggleNewFormVisible} />
     </>
   );

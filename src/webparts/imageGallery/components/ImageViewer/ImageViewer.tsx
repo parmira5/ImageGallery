@@ -5,33 +5,36 @@ import { Comments } from "./Comments/Comments";
 import { panelStyles } from "../fluentui.styles";
 import styles from "./ImageViewer.module.scss";
 import { ImageDescription } from "./ImageDescription";
+import { ConfigContext } from "../../../../context/ConfigContext";
 
 interface IProps extends Pick<IPanelProps, "onDismiss" | "isOpen"> {
   selectedPost: Post;
-  hideComments: boolean;
-  hideTags: boolean;
 }
 
-export const ImageViewer = ({
-  selectedPost,
-  hideComments,
-  hideTags,
-  ...props
-}: React.PropsWithChildren<IProps>): JSX.Element => {
+export const ImageViewer = ({ selectedPost, ...props }: React.PropsWithChildren<IProps>): JSX.Element => {
   const postWrapperRef = React.useRef<HTMLElement>(null);
+  const { commentsDisabled } = React.useContext(ConfigContext);
   if (!selectedPost) return <></>;
   return (
     <Panel {...props} styles={panelStyles} type={PanelType.custom} customWidth="100%" allowTouchBodyScroll>
       <section ref={postWrapperRef} className={styles.postWrapper}>
         <div style={{ position: "relative" }}>
-          {hideComments && (
-            <div style={{ position: "absolute", bottom: 5, left: 0, right: 0 }}>
+          {commentsDisabled && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+              }}
+            >
               <ImageDescription
                 authorEmail={selectedPost.authorEmail}
                 authorName={selectedPost.authorName}
                 createdDate={selectedPost.createdDate}
                 description={selectedPost.description}
                 taggedUsers={selectedPost.taggedUsers}
+                fontColor="white"
               />
             </div>
           )}
@@ -43,7 +46,7 @@ export const ImageViewer = ({
             height={selectedPost.imageHeight}
           />
         </div>
-        {!hideComments && (
+        {!commentsDisabled && (
           <div className={styles.commentsWrapper}>
             <ImageDescription
               authorEmail={selectedPost.authorEmail}
@@ -53,7 +56,7 @@ export const ImageViewer = ({
               taggedUsers={selectedPost.taggedUsers}
               separator
             />
-            <Comments ref={postWrapperRef} image={selectedPost} hideTags={hideTags} />
+            <Comments ref={postWrapperRef} image={selectedPost} />
           </div>
         )}
       </section>

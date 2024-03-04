@@ -3,7 +3,7 @@ import styles from "./ImageViewer.module.scss";
 import { Persona, PersonaSize, Stack, Text } from "@fluentui/react";
 import { formatDistanceToNow } from "date-fns";
 import { TaggedUsers } from "../TaggedUsers/TaggedUsers";
-import { commentTextStyles, dateTextStyles } from "./Comments/fluentui.styles";
+import { textStyles } from "./Comments/fluentui.styles";
 import { ConfigContext } from "../../../../context/ConfigContext";
 import { userService } from "../../../../services/userService";
 
@@ -14,6 +14,7 @@ interface IProps {
   description: string;
   taggedUsers: any[];
   separator?: boolean;
+  fontColor?: string;
 }
 
 export const ImageDescription = ({
@@ -23,6 +24,7 @@ export const ImageDescription = ({
   description,
   taggedUsers,
   separator = false,
+  fontColor,
 }: IProps) => {
   const { taggingDisabled } = React.useContext(ConfigContext);
   const imageUrl = userService.getUserPhotoByEmail(authorEmail, "S");
@@ -35,11 +37,11 @@ export const ImageDescription = ({
           styles={{ root: { position: "relative", top: "3px", minWidth: 40 } }}
         />
         <Stack tokens={{ childrenGap: 3 }}>
-          <Text styles={commentTextStyles} variant="smallPlus">
+          <Text color={fontColor} styles={textStyles(fontColor)} variant="smallPlus">
             <b>{authorName}</b> <span>{description}</span>
           </Text>
           {!!taggedUsers.length && !taggingDisabled && <TaggedUsers users={taggedUsers} maxDisplayablePersonas={3} />}
-          <Text styles={dateTextStyles} variant="smallPlus">
+          <Text color={fontColor} styles={textStyles(fontColor)} variant="smallPlus">
             {createdDate && formatDistanceToNow(new Date(createdDate))} ago
           </Text>
         </Stack>
